@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { subscribeToFloorData, subscribeToAlerts, disconnectSocket } from '../api/socket';
+import {
+  subscribeToFloorData,
+  subscribeToAlerts,
+  subscribeToPredictions,
+  disconnectSocket
+} from '../api/socket';
 
 const INITIAL_FLOOR_DATA = {
   1: {
@@ -81,6 +86,7 @@ const getFloorStatus = (floor) => {
  */
 export const useRealTimeData = () => {
   const [floorData, setFloorData] = useState(INITIAL_FLOOR_DATA);
+  const [predictions, setPredictions] = useState({});
   const [alerts, setAlerts] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -126,10 +132,26 @@ export const useRealTimeData = () => {
     setAlerts((prev) => [newAlert, ...prev.slice(0, 9)]); // Keep last 10 alerts
   }, []);
 
+  // Handle incoming predictions
+  const handlePredictions = useCallback((data) => {
+    console.log('🔮 Processing predictions:', data);
+
+    if (data.predictions && Array.isArray(data.predictions)) {
+      const updatedPredictions = {};
+
+      data.predictions.forEach((floorPrediction) => {
+        updatedPredictions[floorPrediction.floorId] = floorPrediction.predictions;
+      });
+
+      setPredictions(updatedPredictions);
+    }
+  }, []);
+
   useEffect(() => {
     // Subscribe to real-time data
     subscribeToFloorData(handleFloorData);
     subscribeToAlerts(handleAlert);
+    subscribeToPredictions(handlePredictions);
 
     setIsConnected(true);
 
@@ -138,10 +160,11 @@ export const useRealTimeData = () => {
       disconnectSocket();
       setIsConnected(false);
     };
-  }, [handleFloorData, handleAlert]);
+  }, [handleFloorData, handleAlert, handlePredictions]);
 
   return {
     floorData,
+    predictions,
     alerts,
     isConnected
   };

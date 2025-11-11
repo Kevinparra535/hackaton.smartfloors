@@ -152,6 +152,10 @@ export default function SocketDebugger() {
       logEvent('alert', data);
     });
 
+    socket.on('predictions', (data) => {
+      logEvent('predictions', data);
+    });
+
     // Initial status
     updateStatus();
 
@@ -161,6 +165,7 @@ export default function SocketDebugger() {
       socket.off('connect_error');
       socket.off('floorData');
       socket.off('alert');
+      socket.off('predictions');
     };
   }, []);
 

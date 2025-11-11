@@ -90,6 +90,21 @@ export const subscribeToAlerts = (callback) => {
 };
 
 /**
+ * Subscribe to predictions
+ * @param {Function} callback - Function to call with predictions data
+ */
+export const subscribeToPredictions = (callback) => {
+  const socketInstance = getSocket();
+
+  socketInstance.on('predictions', (predictions) => {
+    console.log('🔮 [Predictions Received]', predictions);
+    callback(predictions);
+  });
+
+  console.log('👂 Subscribed to predictions events');
+};
+
+/**
  * Disconnect socket
  */
 export const disconnectSocket = () => {

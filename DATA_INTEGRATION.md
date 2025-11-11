@@ -5,7 +5,6 @@
 ### Evento: `floorData`
 
 El backend envía datos de todos los pisos en un solo objeto con el siguiente formato:
-
 ```json
 {
   "floors": [
@@ -248,6 +247,94 @@ Ver logs detallados en consola del navegador con emojis para fácil identificaci
 3. **Unidades**: Respetar unidades (°C, %, kW)
 4. **Estados**: Se calculan automáticamente en el frontend
 5. **CORS**: Asegurarse de configurar CORS en el backend para `http://localhost:5173`
+
+## 🔮 Predicciones (Nuevo)
+
+### Evento: `predictions`
+
+El backend envía predicciones de todas las métricas para todos los pisos:
+
+```json
+{
+  "predictions": [
+    {
+      "floorId": 1,
+      "predictions": {
+        "occupancy": {
+          "predictions": [
+            { "minutesAhead": 10, "occupancy": 62, "timestamp": "..." },
+            { "minutesAhead": 20, "occupancy": 61, "timestamp": "..." },
+            // ... hasta 60 minutos
+          ],
+          "method": "hybrid",
+          "confidence": 0.91,
+          "currentValue": 51,
+          "predictedValue": 57
+        },
+        "temperature": { /* mismo formato */ },
+        "humidity": { /* mismo formato */ },
+        "powerConsumption": { /* mismo formato */ },
+        "timestamp": "2025-11-11T23:15:41.000Z"
+      }
+    }
+    // ... más pisos
+  ],
+  "timestamp": "2025-11-11T23:15:41.002Z"
+}
+```
+
+### Campos de Predicción
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `floorId` | number | ID del piso (1-5) |
+| `predictions.{metric}.predictions` | array | Array de predicciones temporales |
+| `minutesAhead` | number | Minutos en el futuro (10, 20, 30, 40, 50, 60) |
+| `method` | string | Método de predicción ("hybrid", "arima", "lstm") |
+| `confidence` | number | Nivel de confianza (0-1) |
+| `currentValue` | number | Valor actual de la métrica |
+| `predictedValue` | number | Valor predicho (60 min) |
+
+### Métricas Predecidas
+
+- `occupancy`: Nivel de ocupación (%)
+- `temperature`: Temperatura (°C)
+- `humidity`: Humedad (%)
+- `powerConsumption`: Consumo de energía (kW)
+
+### Procesamiento en Frontend
+
+```javascript
+// src/hooks/useRealTimeData.js
+handlePredictions({
+  predictions: [...]
+});
+
+// Estructura interna
+{
+  1: { // floorId
+    occupancy: { predictions: [...], confidence: 0.91, ... },
+    temperature: { predictions: [...], confidence: 0.91, ... },
+    humidity: { predictions: [...], confidence: 0.91, ... },
+    powerConsumption: { predictions: [...], confidence: 0.91, ... }
+  },
+  2: { /* mismo formato */ }
+  // ... más pisos
+}
+```
+
+### Componente: `PredictionsPanel`
+
+Muestra predicciones del piso seleccionado con:
+
+- ✅ Selector de intervalo temporal (10-60 min)
+- 📊 Valor actual vs predicho
+- 📈 Tendencia (↑ subida, ↓ bajada, → estable)
+- 🎯 Nivel de confianza con código de colores:
+  - Verde (≥90%): Alta confianza
+  - Amarillo (70-89%): Confianza media
+  - Rojo (<70%): Baja confianza
+- 🔧 Método de predicción usado
 
 ## 🔄 Flujo Completo
 

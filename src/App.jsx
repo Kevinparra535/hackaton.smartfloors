@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Dashboard3D from './components/Dashboard3D';
 import AlertsPanel from './components/AlertsPanel';
+import PredictionsPanel from './components/PredictionsPanel';
 import { useRealTimeData } from './hooks/useRealTimeData';
 
 const AppContainer = styled.div`
@@ -128,10 +129,14 @@ const EmptyInfo = styled.div`
 `;
 
 function App() {
-  const { floorData, alerts, isConnected } = useRealTimeData();
+  const { floorData, predictions, alerts, isConnected } = useRealTimeData();
   const [hoveredFloor, setHoveredFloor] = useState(null);
 
   const displayedFloor = hoveredFloor || floorData[1];
+  const displayedPredictions = hoveredFloor ? predictions[hoveredFloor.floorId] : predictions[1];
+  const displayedFloorName = hoveredFloor
+    ? hoveredFloor.name || `Piso ${hoveredFloor.floorId}`
+    : null;
 
   useEffect(() => {
     console.log(floorData);
@@ -189,6 +194,8 @@ function App() {
               <EmptyInfo>Pasa el cursor sobre un piso para ver las métricas detalladas</EmptyInfo>
             )}
           </InfoPanel>
+
+          <PredictionsPanel predictions={displayedPredictions} floorName={displayedFloorName} />
 
           <AlertsPanel alerts={alerts} />
         </Sidebar>
