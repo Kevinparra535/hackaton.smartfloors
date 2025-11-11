@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
 // WebSocket connection configuration
-const SOCKET_URL = 'ws://localhost:3000';
+const SOCKET_URL = 'http://localhost:3000';
 
 let socket = null;
 
@@ -12,23 +12,47 @@ let socket = null;
 export const getSocket = () => {
   if (!socket) {
     socket = io(SOCKET_URL, {
-      path: '/realtime',
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5
     });
 
-    socket.on('connect', () => {
-      console.log('✅ Connected to SmartFloors backend');
+    // Debugging: Log all events
+    socket.onAny((eventName, ...args) => {
+      console.log(`📡 [Socket Event] ${eventName}`, args);
     });
 
-    socket.on('disconnect', () => {
+    socket.on('connect', () => {
+      console.log('✅ Connected to SmartFloors backend');
+      console.log('🔌 Socket ID:', socket.id);
+      console.log('🚀 Transport:', socket.io.engine.transport.name);
+    });
+
+    socket.on('disconnect', (reason) => {
       console.log('❌ Disconnected from backend');
+      console.log('📋 Reason:', reason);
     });
 
     socket.on('connect_error', (error) => {
-      console.error('Connection error:', error.message);
+      console.error('❌ Connection error:', error.message);
+      console.error('📋 Error details:', error);
+    });
+
+    socket.on('reconnect', (attemptNumber) => {
+      console.log('🔄 Reconnected after', attemptNumber, 'attempts');
+    });
+
+    socket.on('reconnect_attempt', (attemptNumber) => {
+      console.log('🔄 Reconnection attempt #', attemptNumber);
+    });
+
+    socket.on('reconnect_error', (error) => {
+      console.error('❌ Reconnection error:', error.message);
+    });
+
+    socket.on('reconnect_failed', () => {
+      console.error('❌ Reconnection failed after all attempts');
     });
   }
 
@@ -43,8 +67,11 @@ export const subscribeToFloorData = (callback) => {
   const socketInstance = getSocket();
 
   socketInstance.on('floorData', (data) => {
+    console.log('📊 [Floor Data Received]', data);
     callback(data);
   });
+
+  console.log('👂 Subscribed to floorData events');
 };
 
 /**
@@ -55,8 +82,11 @@ export const subscribeToAlerts = (callback) => {
   const socketInstance = getSocket();
 
   socketInstance.on('alert', (alert) => {
+    console.log('🚨 [Alert Received]', alert);
     callback(alert);
   });
+
+  console.log('👂 Subscribed to alert events');
 };
 
 /**

@@ -7,7 +7,7 @@ import BuildingScene from '../scenes/BuildingScene';
  * @param {Object} props.floorData - Floor data for visualization
  * @param {Function} props.onFloorHover - Callback for floor hover events
  */
-export default function Dashboard3D({ floorData, onFloorHover }) {
+const Dashboard3D = ({ floorData, onFloorHover }) => {
   return (
     <Canvas
       shadows
@@ -19,4 +19,6 @@ export default function Dashboard3D({ floorData, onFloorHover }) {
       <BuildingScene floorData={floorData} onFloorHover={onFloorHover} />
     </Canvas>
   );
-}
+};
+
+export default Dashboard3D;

@@ -2,9 +2,77 @@ import { useState, useEffect, useCallback } from 'react';
 import { subscribeToFloorData, subscribeToAlerts, disconnectSocket } from '../api/socket';
 
 const INITIAL_FLOOR_DATA = {
-  1: { floor: 1, temperature: 22, humidity: 45, energy: 2.1, status: 'normal' },
-  2: { floor: 2, temperature: 24, humidity: 50, energy: 2.5, status: 'normal' },
-  3: { floor: 3, temperature: 23, humidity: 48, energy: 2.3, status: 'normal' }
+  1: {
+    floorId: 1,
+    name: 'Piso 1',
+    occupancy: 0,
+    temperature: 22,
+    humidity: 45,
+    powerConsumption: 120,
+    status: 'normal',
+    timestamp: new Date().toISOString()
+  },
+  2: {
+    floorId: 2,
+    name: 'Piso 2',
+    occupancy: 0,
+    temperature: 22,
+    humidity: 45,
+    powerConsumption: 120,
+    status: 'normal',
+    timestamp: new Date().toISOString()
+  },
+  3: {
+    floorId: 3,
+    name: 'Piso 3',
+    occupancy: 0,
+    temperature: 22,
+    humidity: 45,
+    powerConsumption: 120,
+    status: 'normal',
+    timestamp: new Date().toISOString()
+  },
+  4: {
+    floorId: 4,
+    name: 'Piso 4',
+    occupancy: 0,
+    temperature: 22,
+    humidity: 45,
+    powerConsumption: 120,
+    status: 'normal',
+    timestamp: new Date().toISOString()
+  },
+  5: {
+    floorId: 5,
+    name: 'Piso 5',
+    occupancy: 0,
+    temperature: 22,
+    humidity: 45,
+    powerConsumption: 120,
+    status: 'normal',
+    timestamp: new Date().toISOString()
+  }
+};
+
+/**
+ * Determine floor status based on environmental conditions
+ * @param {Object} floor - Floor data
+ * @returns {string} Status: 'normal', 'warning', or 'danger'
+ */
+const getFloorStatus = (floor) => {
+  const { temperature, humidity, powerConsumption } = floor;
+
+  // Danger conditions
+  if (temperature > 26 || temperature < 18) return 'danger';
+  if (humidity > 70 || humidity < 30) return 'danger';
+  if (powerConsumption > 150) return 'danger';
+
+  // Warning conditions
+  if (temperature > 24 || temperature < 20) return 'warning';
+  if (humidity > 60 || humidity < 35) return 'warning';
+  if (powerConsumption > 135) return 'warning';
+
+  return 'normal';
 };
 
 /**
@@ -18,10 +86,33 @@ export const useRealTimeData = () => {
 
   // Handle incoming floor data
   const handleFloorData = useCallback((data) => {
-    setFloorData((prev) => ({
-      ...prev,
-      [data.floor]: data
-    }));
+    console.log('📊 Processing floor data:', data);
+
+    // Handle array of floors from backend
+    if (data.floors && Array.isArray(data.floors)) {
+      const updatedFloors = {};
+
+      data.floors.forEach((floor) => {
+        const status = getFloorStatus(floor);
+        updatedFloors[floor.floorId] = {
+          ...floor,
+          status
+        };
+      });
+
+      setFloorData(updatedFloors);
+    }
+    // Handle single floor update (if backend sends individual updates)
+    else if (data.floorId) {
+      const status = getFloorStatus(data);
+      setFloorData((prev) => ({
+        ...prev,
+        [data.floorId]: {
+          ...data,
+          status
+        }
+      }));
+    }
   }, []);
 
   // Handle incoming alerts
@@ -29,7 +120,7 @@ export const useRealTimeData = () => {
     const newAlert = {
       ...alert,
       id: Date.now(),
-      timestamp: new Date().toISOString()
+      timestamp: alert.timestamp || new Date().toISOString()
     };
 
     setAlerts((prev) => [newAlert, ...prev.slice(0, 9)]); // Keep last 10 alerts

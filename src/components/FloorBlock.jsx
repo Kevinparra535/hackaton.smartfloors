@@ -12,7 +12,7 @@ const STATUS_COLORS = {
 /**
  * FloorBlock component - 3D representation of a building floor
  * @param {Object} props
- * @param {Object} props.data - Floor data (temperature, humidity, energy, status)
+ * @param {Object} props.data - Floor data (floorId, name, temperature, humidity, powerConsumption, occupancy, status)
  * @param {number} props.position - Y position of the floor
  * @param {Function} props.onHover - Callback when floor is hovered
  */
@@ -60,7 +60,7 @@ export default function FloorBlock({ data, position, onHover }) {
         anchorX='center'
         anchorY='middle'
       >
-        Floor {data.floor}
+        {data.name || `Piso ${data.floorId}`}
       </Text>
 
       {/* Status indicator */}

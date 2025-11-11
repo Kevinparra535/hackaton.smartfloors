@@ -1,0 +1,268 @@
+# Integración de Datos - SmartFloors AI
+
+## 📡 Estructura de Datos del Backend
+
+### Evento: `floorData`
+
+El backend envía datos de todos los pisos en un solo objeto con el siguiente formato:
+
+```json
+{
+  "floors": [
+    {
+      "buildingId": 1,
+      "buildingName": "Edificio Principal",
+      "floorId": 1,
+      "name": "Piso 1",
+      "occupancy": 73,
+      "temperature": 22.1,
+      "humidity": 38,
+      "powerConsumption": 130.7,
+      "timestamp": "2025-11-11T23:09:40.991Z"
+    },
+    {
+      "buildingId": 1,
+      "buildingName": "Edificio Principal",
+      "floorId": 2,
+      "name": "Piso 2",
+      "occupancy": 57,
+      "temperature": 22.6,
+      "humidity": 43,
+      "powerConsumption": 123.7,
+      "timestamp": "2025-11-11T23:09:40.991Z"
+    }
+    // ... hasta floorId: 5
+  ],
+  "timestamp": "2025-11-11T23:10:33.577Z"
+}
+```
+
+### Campos por Piso
+
+| Campo              | Tipo   | Descripción             | Unidad    |
+| ------------------ | ------ | ----------------------- | --------- |
+| `buildingId`       | number | ID del edificio         | -         |
+| `buildingName`     | string | Nombre del edificio     | -         |
+| `floorId`          | number | ID único del piso (1-5) | -         |
+| `name`             | string | Nombre del piso         | -         |
+| `occupancy`        | number | Nivel de ocupación      | % (0-100) |
+| `temperature`      | number | Temperatura ambiente    | °C        |
+| `humidity`         | number | Nivel de humedad        | % (0-100) |
+| `powerConsumption` | number | Consumo de energía      | kW        |
+| `timestamp`        | string | Timestamp ISO 8601      | -         |
+
+## 🎨 Lógica de Estados
+
+El frontend calcula automáticamente el estado de cada piso basado en las métricas:
+
+### Estado: `danger` (🔴 Rojo - #ff4d4f)
+
+```javascript
+temperature > 26°C || temperature < 18°C
+humidity > 70% || humidity < 30%
+powerConsumption > 150 kW
+```
+
+### Estado: `warning` (🟡 Amarillo - #ffd966)
+
+```javascript
+temperature > 24°C || temperature < 20°C
+humidity > 60% || humidity < 35%
+powerConsumption > 135 kW
+```
+
+### Estado: `normal` (🟢 Verde - #00ff88)
+
+Cualquier valor que no cumpla las condiciones anteriores.
+
+## 🔄 Procesamiento de Datos
+
+### Hook: `useRealTimeData.js`
+
+```javascript
+// Recibe datos del backend
+handleFloorData({
+  floors: [...],
+  timestamp: "..."
+});
+
+// Procesa y calcula estados
+floors.forEach((floor) => {
+  const status = getFloorStatus(floor);
+  updatedFloors[floor.floorId] = {
+    ...floor,
+    status // ← Estado calculado
+  };
+});
+
+// Actualiza estado React
+setFloorData(updatedFloors);
+```
+
+### Estructura Interna
+
+```javascript
+// Estado interno de floorData
+{
+  1: { floorId: 1, name: "Piso 1", temperature: 22.1, ..., status: "normal" },
+  2: { floorId: 2, name: "Piso 2", temperature: 22.6, ..., status: "normal" },
+  3: { floorId: 3, name: "Piso 3", temperature: 24.0, ..., status: "warning" },
+  4: { floorId: 4, name: "Piso 4", temperature: 23.5, ..., status: "normal" },
+  5: { floorId: 5, name: "Piso 5", temperature: 23.2, ..., status: "normal" }
+}
+```
+
+## 🚨 Alertas (Opcional)
+
+Si el backend envía alertas por separado, deben incluir:
+
+```json
+{
+  "floorId": 3,
+  "floorName": "Piso 3",
+  "type": "temperature",
+  "severity": "danger",
+  "message": "Temperatura crítica detectada",
+  "value": 28.5,
+  "timestamp": "2025-11-11T23:15:00.000Z"
+}
+```
+
+### Campos de Alerta
+
+| Campo       | Tipo   | Requerido | Descripción                                   |
+| ----------- | ------ | --------- | --------------------------------------------- |
+| `floorId`   | number | ✅        | ID del piso afectado                          |
+| `floorName` | string | ❌        | Nombre del piso (opcional)                    |
+| `type`      | string | ❌        | Tipo de alerta (temperature, humidity, power) |
+| `severity`  | string | ❌        | Severidad (normal, warning, danger)           |
+| `message`   | string | ✅        | Mensaje descriptivo                           |
+| `value`     | number | ❌        | Valor que generó la alerta                    |
+| `timestamp` | string | ✅        | Timestamp ISO 8601                            |
+
+## 🔌 Configuración WebSocket
+
+### Frontend (Socket.IO Client)
+
+```javascript
+// src/api/socket.js
+const SOCKET_URL = 'http://localhost:3000';
+const socket = io(SOCKET_URL);
+
+// Suscribirse a eventos
+socket.on('floorData', (data) => {
+  // Procesar { floors: [...], timestamp: "..." }
+});
+
+socket.on('alert', (alert) => {
+  // Procesar alerta individual
+});
+```
+
+### Backend Esperado (Socket.IO Server)
+
+```javascript
+// Ejemplo de emisión desde el backend
+io.emit('floorData', {
+  floors: [
+    /* array de 5 pisos */
+  ],
+  timestamp: new Date().toISOString()
+});
+
+// Emitir alerta individual
+io.emit('alert', {
+  floorId: 3,
+  message: 'Temperatura alta',
+  severity: 'warning',
+  timestamp: new Date().toISOString()
+});
+```
+
+## 📊 Visualización 3D
+
+### Configuración de Pisos
+
+```javascript
+// src/scenes/BuildingScene.jsx
+
+// 5 pisos apilados verticalmente
+const getFloorPosition = (floorNumber) => {
+  return (floorNumber - 3) * 1.2; // Centrado verticalmente
+};
+
+// Renderizado dinámico
+Object.values(floorData).map((floor) => (
+  <FloorBlock key={floor.floorId} data={floor} position={getFloorPosition(floor.floorId)} />
+));
+```
+
+### Animaciones
+
+- **Estado Normal**: Emissive intensity estática (0.2)
+- **Estado Warning/Danger**: Animación de "respiración"
+  - Pulsación de intensidad (0.4 - 1.0)
+  - Escalado sutil (0.98 - 1.02)
+
+## 🧪 Testing con Datos Mock
+
+Para probar sin backend, puedes emitir eventos manualmente desde la consola del navegador:
+
+```javascript
+// Abrir DevTools > Console
+const { getSocket } = await import('/src/api/socket.js');
+const socket = getSocket();
+
+// Emitir datos de prueba
+socket.emit('floorData', {
+  floors: [
+    {
+      floorId: 1,
+      name: 'Piso 1',
+      temperature: 28, // ← Danger!
+      humidity: 45,
+      powerConsumption: 125,
+      occupancy: 70
+    }
+    // ... más pisos
+  ],
+  timestamp: new Date().toISOString()
+});
+```
+
+## 🐛 Debugging
+
+Usa el componente `<SocketDebugger />` para ver:
+
+- ✅ Estado de conexión
+- 📡 Todos los eventos entrantes
+- 📊 Datos de cada evento
+- ⏰ Timestamps
+
+Ver logs detallados en consola del navegador con emojis para fácil identificación.
+
+## 📝 Notas Importantes
+
+1. **Timestamps**: Todos los timestamps deben estar en formato ISO 8601
+2. **IDs**: Los `floorId` deben ser únicos (1-5)
+3. **Unidades**: Respetar unidades (°C, %, kW)
+4. **Estados**: Se calculan automáticamente en el frontend
+5. **CORS**: Asegurarse de configurar CORS en el backend para `http://localhost:5173`
+
+## 🔄 Flujo Completo
+
+```
+Backend → Socket.IO → Frontend
+   ↓
+Emite 'floorData'
+   ↓
+useRealTimeData hook
+   ↓
+Calcula estados (normal/warning/danger)
+   ↓
+Actualiza React state
+   ↓
+Re-renderiza componentes 3D
+   ↓
+Animaciones según estado
+```

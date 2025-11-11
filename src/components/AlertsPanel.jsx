@@ -109,10 +109,10 @@ const formatTime = (timestamp) => {
 export default function AlertsPanel({ alerts }) {
   return (
     <Panel>
-      <Title>🚨 Recent Alerts</Title>
+      <Title>🚨 Alertas Recientes</Title>
       <AnimatePresence mode='popLayout'>
         {alerts.length === 0 ? (
-          <EmptyState>No alerts at the moment. All systems normal.</EmptyState>
+          <EmptyState>Sin alertas por el momento. Todos los sistemas normales.</EmptyState>
         ) : (
           alerts.map((alert) => (
             <AlertItem
@@ -124,11 +124,14 @@ export default function AlertsPanel({ alerts }) {
               transition={{ duration: 0.3 }}
             >
               <AlertHeader>
-                <AlertFloor>Floor {alert.floor}</AlertFloor>
+                <AlertFloor>
+                  {alert.floorName || alert.name || `Piso ${alert.floorId || alert.floor}`}
+                </AlertFloor>
                 <AlertTime>{formatTime(alert.timestamp)}</AlertTime>
               </AlertHeader>
               <AlertMessage>
-                {alert.message || `${alert.type || 'Alert'}: ${alert.value || 'Anomaly detected'}`}
+                {alert.message ||
+                  `${alert.type || 'Alerta'}: ${alert.value || 'Anomalía detectada'}`}
               </AlertMessage>
             </AlertItem>
           ))

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Dashboard3D from './components/Dashboard3D';
 import AlertsPanel from './components/AlertsPanel';
@@ -133,6 +133,10 @@ function App() {
 
   const displayedFloor = hoveredFloor || floorData[1];
 
+  useEffect(() => {
+    console.log(floorData);
+  }, [floorData]);
+
   return (
     <AppContainer>
       <Header>
@@ -150,31 +154,39 @@ function App() {
         <Sidebar>
           <InfoPanel>
             <InfoTitle>
-              {hoveredFloor ? `Floor ${hoveredFloor.floor} Metrics` : 'Hover over a floor'}
+              {hoveredFloor
+                ? `${hoveredFloor.name || `Piso ${hoveredFloor.floorId}`} - Métricas`
+                : 'Pasa el cursor sobre un piso'}
             </InfoTitle>
             {displayedFloor ? (
               <MetricGrid>
                 <MetricCard>
-                  <MetricLabel>🌡️ Temperature</MetricLabel>
+                  <MetricLabel>🌡️ Temperatura</MetricLabel>
                   <MetricValue>{displayedFloor.temperature}°C</MetricValue>
                 </MetricCard>
                 <MetricCard>
-                  <MetricLabel>💧 Humidity</MetricLabel>
+                  <MetricLabel>💧 Humedad</MetricLabel>
                   <MetricValue>{displayedFloor.humidity}%</MetricValue>
                 </MetricCard>
                 <MetricCard>
-                  <MetricLabel>⚡ Energy</MetricLabel>
-                  <MetricValue>{displayedFloor.energy} kW</MetricValue>
+                  <MetricLabel>⚡ Consumo</MetricLabel>
+                  <MetricValue>{displayedFloor.powerConsumption} kW</MetricValue>
                 </MetricCard>
                 <MetricCard>
-                  <MetricLabel>📊 Status</MetricLabel>
+                  <MetricLabel>� Ocupación</MetricLabel>
+                  <MetricValue>{displayedFloor.occupancy}%</MetricValue>
+                </MetricCard>
+                <MetricCard style={{ gridColumn: 'span 2' }}>
+                  <MetricLabel>📊 Estado</MetricLabel>
                   <MetricValue style={{ fontSize: '1rem', textTransform: 'capitalize' }}>
-                    {displayedFloor.status}
+                    {displayedFloor.status === 'normal' && '✅ Normal'}
+                    {displayedFloor.status === 'warning' && '⚠️ Advertencia'}
+                    {displayedFloor.status === 'danger' && '🚨 Peligro'}
                   </MetricValue>
                 </MetricCard>
               </MetricGrid>
             ) : (
-              <EmptyInfo>Hover over a floor to see detailed metrics</EmptyInfo>
+              <EmptyInfo>Pasa el cursor sobre un piso para ver las métricas detalladas</EmptyInfo>
             )}
           </InfoPanel>
 
