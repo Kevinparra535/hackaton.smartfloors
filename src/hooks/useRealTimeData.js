@@ -86,7 +86,7 @@ const getFloorStatus = (floor) => {
  * @returns {Object} Floor data, alerts, and connection status
  */
 export const useRealTimeData = () => {
-  const [floorData, setFloorData] = useState(INITIAL_FLOOR_DATA);
+  const [floorData, setFloorData] = useState();
   const [predictions, setPredictions] = useState({});
   const [alerts, setAlerts] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
