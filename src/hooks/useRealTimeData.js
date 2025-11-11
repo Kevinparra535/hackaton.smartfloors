@@ -124,14 +124,27 @@ export const useRealTimeData = () => {
   }, []);
 
   // Handle incoming alerts
-  const handleAlert = useCallback((alert) => {
-    const newAlert = {
-      ...alert,
-      id: Date.now(),
-      timestamp: alert.timestamp || new Date().toISOString()
-    };
+  const handleAlert = useCallback((alertData) => {
+    console.log('🚨 Processing alert:', alertData);
 
-    setAlerts((prev) => [newAlert, ...prev.slice(0, 9)]); // Keep last 10 alerts
+    // Backend sends alerts with anomalies array inside
+    // Format: { floorId, floorName, anomalies: [...], timestamp, severity }
+    if (alertData.anomalies && Array.isArray(alertData.anomalies)) {
+      const newAlerts = alertData.anomalies.map((anomaly, index) => ({
+        id: `${alertData.floorId}_${alertData.timestamp}_${index}`,
+        floorId: alertData.floorId,
+        floorName: alertData.floorName,
+        type: anomaly.type,
+        severity: anomaly.severity,
+        message: anomaly.message,
+        value: anomaly.value,
+        recommendation: anomaly.recommendation,
+        timestamp: anomaly.timestamp || alertData.timestamp
+      }));
+
+      // Add new alerts to the beginning, keep last 10
+      setAlerts((prev) => [...newAlerts, ...prev].slice(0, 10));
+    }
   }, []);
 
   // Handle incoming predictions
@@ -174,15 +187,37 @@ export const useRealTimeData = () => {
 
         // Fetch initial alerts
         try {
-          const initialAlerts = await fetchAlerts();
-          const formattedAlerts = initialAlerts.map((alert) => ({
-            ...alert,
-            id: alert.id || Date.now()
-          }));
-          setAlerts(formattedAlerts);
+          const alertsData = await fetchAlerts();
+
+          // Backend returns alerts with anomalies array
+          // Format each alert's anomaly as a separate alert for display
+          const formattedAlerts = [];
+
+          alertsData.forEach((alertGroup) => {
+            if (alertGroup.anomalies && Array.isArray(alertGroup.anomalies)) {
+              alertGroup.anomalies.forEach((anomaly, index) => {
+                formattedAlerts.push({
+                  id: `${alertGroup.floorId}_${alertGroup.timestamp}_${index}`,
+                  floorId: alertGroup.floorId,
+                  floorName: alertGroup.floorName,
+                  type: anomaly.type,
+                  severity: anomaly.severity,
+                  message: anomaly.message,
+                  value: anomaly.value,
+                  recommendation: anomaly.recommendation,
+                  timestamp: anomaly.timestamp || alertGroup.timestamp
+                });
+              });
+            }
+          });
+
+          // Sort by timestamp (newest first) and take last 10
+          formattedAlerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          setAlerts(formattedAlerts.slice(0, 10));
+
           console.log(
             '✅ [useRealTimeData] Initial alerts loaded:',
-            initialAlerts.length,
+            formattedAlerts.length,
             'alerts'
           );
         } catch (alertError) {
