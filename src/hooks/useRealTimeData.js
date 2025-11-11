@@ -5,6 +5,7 @@ import {
   subscribeToPredictions,
   disconnectSocket
 } from '../api/socket';
+import { fetchAllFloors, fetchAlerts } from '../api/rest';
 
 const INITIAL_FLOOR_DATA = {
   1: {
@@ -89,6 +90,7 @@ export const useRealTimeData = () => {
   const [predictions, setPredictions] = useState({});
   const [alerts, setAlerts] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Handle incoming floor data
   const handleFloorData = useCallback((data) => {
@@ -147,7 +149,62 @@ export const useRealTimeData = () => {
     }
   }, []);
 
+  // Load initial data from REST API
   useEffect(() => {
+    const loadInitialData = async () => {
+      console.log('🔄 [useRealTimeData] Loading initial data from REST API...');
+      setIsLoading(true);
+
+      try {
+        // Fetch initial floor data
+        const floors = await fetchAllFloors();
+
+        // Process floors with status calculation
+        const processedFloors = {};
+        floors.forEach((floor) => {
+          const status = getFloorStatus(floor);
+          processedFloors[floor.floorId] = {
+            ...floor,
+            status
+          };
+        });
+
+        setFloorData(processedFloors);
+        console.log('✅ [useRealTimeData] Initial floor data loaded:', floors.length, 'floors');
+
+        // Fetch initial alerts
+        try {
+          const initialAlerts = await fetchAlerts();
+          const formattedAlerts = initialAlerts.map((alert) => ({
+            ...alert,
+            id: alert.id || Date.now()
+          }));
+          setAlerts(formattedAlerts);
+          console.log(
+            '✅ [useRealTimeData] Initial alerts loaded:',
+            initialAlerts.length,
+            'alerts'
+          );
+        } catch (alertError) {
+          console.warn('⚠️ [useRealTimeData] Could not load alerts:', alertError.message);
+          // Continue without alerts - not critical
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('❌ [useRealTimeData] Error loading initial data:', error.message);
+        setIsLoading(false);
+        // Keep using INITIAL_FLOOR_DATA as fallback
+      }
+    };
+
+    loadInitialData();
+  }, []);
+
+  // Subscribe to WebSocket updates
+  useEffect(() => {
+    console.log('🔌 [useRealTimeData] Subscribing to WebSocket events...');
+
     // Subscribe to real-time data
     subscribeToFloorData(handleFloorData);
     subscribeToAlerts(handleAlert);
@@ -157,6 +214,7 @@ export const useRealTimeData = () => {
 
     // Cleanup on unmount
     return () => {
+      console.log('🔌 [useRealTimeData] Disconnecting from WebSocket...');
       disconnectSocket();
       setIsConnected(false);
     };
@@ -166,6 +224,7 @@ export const useRealTimeData = () => {
     floorData,
     predictions,
     alerts,
-    isConnected
+    isConnected,
+    isLoading
   };
 };
