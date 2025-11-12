@@ -60,9 +60,9 @@ const Home = () => {
       </CanvasWrapper>
 
       {/* Color Legend - Leyenda de estados */}
-      <ColorLegend currentMode={currentMode} />
+      {/* <ColorLegend currentMode={currentMode} /> */}
 
-      <InfoPanel>
+      {/* <InfoPanel>
         <InfoTitle>
           {hoveredFloor
             ? `${hoveredFloor.name || `Piso ${hoveredFloor.floorId}`} - Métricas`
@@ -98,7 +98,7 @@ const Home = () => {
         ) : (
           <EmptyInfo>Pasa el cursor sobre un piso para ver las métricas detalladas</EmptyInfo>
         )}
-      </InfoPanel>
+      </InfoPanel> */}
 
       {/* <PredictionsPanel predictions={displayedPredictions} floorName={displayedFloorName} /> */}
 

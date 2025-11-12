@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Html } from '@react-three/drei';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import styled from 'styled-components';
 
 const HtmlContainer = styled.div`
   width: ${(props) => props.$width}px;
-  height: ${(props) => props.$height}px;
+  height: ${(props) => props.$height + 50}px;
   background: rgba(10, 10, 10, 0.9);
-  border: 2px solid ${(props) => (props.$isHovered ? '#00ff88' : '#646cff')};
+  border: 2px solid #646cff;
   border-radius: 8px;
   padding: 20px;
   color: white;
@@ -17,17 +17,9 @@ const HtmlContainer = styled.div`
   box-shadow: 0 8px 32px rgba(100, 108, 255, 0.3);
   pointer-events: auto;
   overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s ease;
 
   &:hover {
     border-color: #00ff88;
-    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.4);
-    transform: scale(1.02);
-  }
-
-  &:active {
-    transform: scale(0.98);
   }
 `;
 
@@ -45,28 +37,21 @@ const Content = styled.div`
 `;
 
 /**
- * InteractiveWall - Simple vertical wall plane on the left side with HTML overlay
- * HTML is integrated in 3D space and respects depth/occlusion
+ * InteractiveWall - Simple vertical wall plane with HTML overlay
  */
-export default function InteractiveWall() {
-  const { camera, controls } = useThree();
-  const [isHovered, setIsHovered] = useState(false);
+export default function InteractiveWall({ cameraControlsRef }) {
+  const [isFocused, setIsFocused] = useState(false);
+  const { size } = useThree(); // Get canvas size instead of window size
   const [dimensions, setDimensions] = useState({
     width: 1200,
     height: 600,
-    aspectRatio: window.innerWidth / window.innerHeight
+    aspectRatio: size.width / size.height
   });
 
-  // Zoom animation state
-  const isZooming = useRef(false);
-  const zoomTarget = useRef(new THREE.Vector3(9, 0, 0)); // Camera position when zoomed
-  const lookAtTarget = useRef(new THREE.Vector3(15, 0, 0)); // Look at wall center
-  const zoomProgress = useRef(0);
-
-  // Update dimensions based on screen aspect ratio
+  // Update dimensions based on canvas aspect ratio
   useEffect(() => {
     const updateDimensions = () => {
-      const aspectRatio = window.innerWidth / window.innerHeight;
+      const aspectRatio = size.width / size.height;
       const baseWidth = 1200;
       const baseHeight = baseWidth / aspectRatio;
 
@@ -78,65 +63,51 @@ export default function InteractiveWall() {
     };
 
     updateDimensions();
-    window.addEventListener('resize', updateDimensions);
+  }, [size.width, size.height]); // Update when canvas size changes
 
-    return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
+  const handleClick = () => {
+    if (!cameraControlsRef?.current) {
+      console.error('❌ CameraControls not available');
+      return;
+    }
 
-  const handleHtmlClick = () => {
-    console.log('🖱️ HTML clicked - starting zoom animation');
-    
-    // Start zoom animation
-    isZooming.current = true;
-    zoomProgress.current = 0;
+    const controls = cameraControlsRef.current;
+    const wallPosition = { x: 15, y: 0, z: 0 };
 
-    // Disable OrbitControls during zoom
-    if (controls) {
-      controls.enabled = false;
+    if (isFocused) {
+      // Reset camera to default view
+      console.log('🔄 Resetting camera from HTML');
+      controls.setLookAt(
+        10,
+        6,
+        5, // Default camera position
+        0,
+        0,
+        0, // Look at center
+        true // Smooth transition
+      );
+      setIsFocused(false);
+    } else {
+      // Dolly to HTML wall - close enough to fill the screen
+      // Center camera at same Y position as HTML for better framing
+      console.log('🎬 Dolly to HTML wall');
+      controls.setLookAt(
+        wallPosition.x - 4,
+        0,
+        0, // Camera at same Y height as HTML center
+        wallPosition.x,
+        0,
+        0, // Look directly at HTML center
+        true // Smooth transition
+      );
+      setIsFocused(true);
     }
   };
-
-  // Handle zoom animation
-  useFrame(() => {
-    if (!isZooming.current || !camera) return;
-
-    zoomProgress.current += 0.05; // Speed of zoom
-    const isComplete = zoomProgress.current >= 1;
-
-    if (isComplete) {
-      zoomProgress.current = 1;
-      isZooming.current = false;
-    }
-
-    // Easing function
-    const t = zoomProgress.current;
-    const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-
-    // Smoothly move camera to zoom position
-    camera.position.lerp(zoomTarget.current, eased * 0.15);
-
-    // Update controls target smoothly
-    if (controls?.target) {
-      controls.target.lerp(lookAtTarget.current, eased * 0.15);
-    }
-
-    // When zoom completes, snap to final position
-    if (isComplete) {
-      camera.position.copy(zoomTarget.current);
-      if (controls?.target) {
-        controls.target.copy(lookAtTarget.current);
-      }
-      // Keep controls disabled to maintain view
-      if (controls) {
-        controls.update();
-      }
-    }
-  });
 
   return (
     <group position={[15, 0, 0]}>
       {/* Simple wall plane - no interaction */}
-      <mesh rotation={[0, Math.PI / 2, 0]}>
+      <mesh rotation={[0, Math.PI / 2, 0]} position={[0.1, 0, 0]}>
         <planeGeometry args={[30, 12]} />
         <meshStandardMaterial
           color='#1a1a1a'
@@ -150,19 +121,17 @@ export default function InteractiveWall() {
       {/* HTML Content integrated in 3D space */}
       <Html
         transform
-        occlude="blending"
+        occlude='blending'
         distanceFactor={2.5}
-        position={[0, 0, 0.1]}
+        position={[0, 0, 1]}
         rotation={[0, -Math.PI / 2, 0]}
         zIndexRange={[100, 0]}
       >
         <HtmlContainer
           $width={dimensions.width}
           $height={dimensions.height}
-          $isHovered={isHovered}
-          onClick={handleHtmlClick}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onClick={handleClick}
+          style={{ cursor: 'pointer' }}
         >
           <Title>SmartFloors Monitor</Title>
           <Content>
@@ -173,7 +142,7 @@ export default function InteractiveWall() {
               <strong>Dimensiones:</strong> {dimensions.width}x{dimensions.height}px
             </p>
             <p>
-              <strong>Resolución:</strong> {window.innerWidth}x{window.innerHeight}px
+              <strong>Canvas:</strong> {size.width}x{size.height}px
             </p>
           </Content>
         </HtmlContainer>

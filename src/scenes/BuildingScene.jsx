@@ -1,9 +1,9 @@
 import {
-  OrbitControls,
   Environment,
   PerspectiveCamera,
   Stars,
-  SpotLight
+  SpotLight,
+  CameraControls
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import FloorBlock from '../components/FloorBlock';
@@ -22,21 +22,59 @@ import * as THREE from 'three';
  * @param {Function} props.onFloorClick - Callback when a floor is clicked for zoom
  */
 const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
-  const controlsRef = useRef();
-  const { zoomToFloor, resetCamera } = useCameraZoom();
+  const cameraControlsRef = useRef();
+  const { resetCamera } = useCameraZoom();
+  const lastClickedFloor = useRef(null);
 
   const handleHover = (data) => {
     onFloorHover(data);
   };
-
   const handleClick = (clickData) => {
     if (onFloorClick) {
       onFloorClick(clickData);
     }
 
-    // Zoom camera to the clicked floor (or reset if same floor)
-    if (clickData?.floorY !== undefined && clickData?.floorId !== undefined) {
-      zoomToFloor(clickData.floorY, clickData.floorId);
+    // Dolly camera to the clicked floor using CameraControls
+    if (clickData?.floorY !== undefined && cameraControlsRef.current) {
+      const controls = cameraControlsRef.current;
+
+      // Check if clicking the same floor - reset camera
+      if (lastClickedFloor.current === clickData.floorId) {
+        console.log('🔄 Resetting camera to default view');
+        controls.setLookAt(
+          10,
+          6,
+          5, // Default camera position
+          0,
+          0,
+          0, // Look at center
+          true // Smooth transition
+        );
+        lastClickedFloor.current = null;
+        return;
+      }
+
+      // Get current camera position to calculate dolly direction
+      const targetPosition = {
+        x: 0, // Center X (floors are centered)
+        y: clickData.floorY, // Floor Y position
+        z: 0 // Center Z
+      };
+
+      // Use setLookAt to dolly the camera closer to the floor
+      // This physically moves the camera (dolly) instead of just changing target
+      controls.setLookAt(
+        3,
+        clickData.floorY,
+        5, // Move camera closer to the floor
+        targetPosition.x,
+        targetPosition.y,
+        targetPosition.z, // Look at floor
+        true // Enable smooth transition
+      );
+
+      lastClickedFloor.current = clickData.floorId;
+      console.log('🎬 Dolly to floor:', clickData.floorId, 'at Y:', clickData.floorY);
     }
   };
 
@@ -75,26 +113,13 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
         color='#ffffff'
       />
 
-      <SpotLight
-        position={[0, 20, 0]}
-        target-position={[15, 0, 0]}
-        castShadow
-        penumbra={1}
-        distance={15}
-        angle={0.4}
-        attenuation={3}
-        anglePower={5}
-        intensity={3}
-        color='#646cff'
-      />
-
       {/* Immersive Background Elements */}
       <GradientBackground />
       <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
       <FloatingParticles count={150} />
 
       {/* Interactive wall - Right side with integrated 3D HTML */}
-      <InteractiveWall />
+      <InteractiveWall cameraControlsRef={cameraControlsRef} />
 
       {/* Environment for reflections */}
       <Environment preset='city' background={false} />
@@ -153,16 +178,14 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
       </EffectComposer>
 
       {/* Controls */}
-      <OrbitControls
-        ref={controlsRef}
-        enablePan={true}
-        enableZoom={true}
-        enableRotate={true}
-        minDistance={0}
-        maxDistance={25}
+      <CameraControls
+        ref={cameraControlsRef}
+        makeDefault
+        minDistance={0.5}
+        maxDistance={100}
+        smoothTime={0.25}
+        draggingSmoothTime={0.25}
         maxPolarAngle={Math.PI / 2}
-        autoRotate={false}
-        autoRotateSpeed={0.5}
       />
     </>
   );
