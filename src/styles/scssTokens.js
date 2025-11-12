@@ -44,14 +44,27 @@ export const colors = {
   mood_five_light: 'var(--color-mood-five-light)',
 
   negative: 'var(--color-negative)',
-  warning: 'var(--color-warning)',
+  warning_var: 'var(--color-warning)', // CSS variable version
   info: 'var(--color-info)',
   check: 'var(--color-check)',
 
   bg_light: 'var(--color-bg-light)',
   bg_dark: 'var(--color-bg-dark)',
   light: 'var(--color-light)',
-  dark: 'var(--color-dark)'
+  dark: 'var(--color-dark)',
+
+  // Alert/Status colors - Direct values for consistency
+  white: '#ffffff',
+  danger: '#ff4d4f',
+  warning: '#ffd966',
+  success: '#00ff88',
+  bg_card: 'rgba(26, 26, 26, 0.95)',
+  border: 'rgba(100, 108, 255, 0.3)',
+  
+  // Predictive alert colors
+  predictive_critical: '#9d4edd', // Purple
+  predictive_warning: '#646cff',  // Blue
+  predictive_normal: '#00b4d8'    // Cyan
 };
 
 // Typography tokens

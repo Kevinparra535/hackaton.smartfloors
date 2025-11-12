@@ -5,7 +5,7 @@ import { CanvasWrapper, MainContent } from '../styles/AppContainer.styled';
 import { useOutletContext } from 'react-router-dom';
 
 const Home = () => {
-  const { floorData, predictions, currentMode } = useOutletContext();
+  const { floorData, predictions, alerts, currentMode } = useOutletContext();
 
   return (
     <MainContent>
@@ -13,6 +13,7 @@ const Home = () => {
         <Dashboard3D
           floorData={floorData}
           predictions={predictions}
+          alerts={alerts}
         />
       </CanvasWrapper>
 

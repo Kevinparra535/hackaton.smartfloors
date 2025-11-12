@@ -31,33 +31,59 @@ export const Panel = styled.div`
 `;
 
 export const Title = styled.h2`
-  color: ${({ theme }) => theme.text.primary};
+  color: ${scssTokens.colors.white};
   font-size: 1.4rem;
   margin: 0 0 16px 0;
   font-weight: 600;
 `;
 
 export const AlertItem = styled(motion.div)`
-  background: ${({ $severity, theme }) => {
-    // Map 'critical' from backend to 'danger' color
-    if ($severity === 'danger' || $severity === 'critical') {
-      return theme.colors.dangerLight || 'rgba(255, 77, 79, 0.15)';
+  background: ${({ $severity, $isPredictive }) => {
+    const severity = $severity?.toLowerCase();
+    
+    // Predictive alerts get a purple/blue tint
+    if ($isPredictive) {
+      if (severity === 'danger' || severity === 'critical') {
+        return 'rgba(157, 78, 221, 0.15)'; // Purple for predictive critical
+      }
+      if (severity === 'warning') {
+        return 'rgba(100, 108, 255, 0.15)'; // Blue for predictive warning
+      }
+      return 'rgba(0, 180, 216, 0.15)'; // Cyan for predictive normal
     }
-    if ($severity === 'warning') {
-      return theme.colors.warningLight || 'rgba(255, 217, 102, 0.15)';
+    
+    // Current alerts - original colors
+    if (severity === 'danger' || severity === 'critical') {
+      return 'rgba(255, 77, 79, 0.15)';
     }
-    return theme.colors.successLight || 'rgba(0, 255, 136, 0.15)';
+    if (severity === 'warning') {
+      return 'rgba(255, 217, 102, 0.15)';
+    }
+    return 'rgba(0, 255, 136, 0.15)';
   }};
   border-left: 3px solid
-    ${({ $severity, theme }) => {
-      // Map 'critical' from backend to 'danger' color
-      if ($severity === 'danger' || $severity === 'critical') {
-        return theme.colors.danger;
+    ${({ $severity, $isPredictive }) => {
+      const severity = $severity?.toLowerCase();
+      
+      // Predictive alerts get a purple/blue border
+      if ($isPredictive) {
+        if (severity === 'danger' || severity === 'critical') {
+          return '#9d4edd'; // Purple for predictive critical
+        }
+        if (severity === 'warning') {
+          return '#646cff'; // Blue for predictive warning
+        }
+        return '#00b4d8'; // Cyan for predictive normal
       }
-      if ($severity === 'warning') {
-        return theme.colors.warning;
+      
+      // Current alerts - original colors
+      if (severity === 'danger' || severity === 'critical') {
+        return '#ff4d4f'; // Red
       }
-      return theme.colors.success;
+      if (severity === 'warning') {
+        return '#ffd966'; // Yellow
+      }
+      return '#00ff88'; // Green
     }};
   padding: 12px;
   margin-bottom: 10px;
@@ -72,25 +98,25 @@ export const AlertHeader = styled.div`
 `;
 
 export const AlertFloor = styled.span`
-  color: ${({ theme }) => theme.text.primary};
+  color: ${scssTokens.colors.white};
   font-weight: 600;
   font-size: 0.9rem;
 `;
 
 export const AlertTime = styled.span`
-  color: ${({ theme }) => theme.text.dimmed};
+  color: #aaaaaa;
   font-size: 0.75rem;
 `;
 
 export const AlertMessage = styled.p`
-  color: ${({ theme }) => theme.text.secondary};
+  color: #cccccc;
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.4;
 `;
 
 export const EmptyState = styled.div`
-  color: ${({ theme }) => theme.text.dimmed};
+  color: #888888;
   text-align: center;
   padding: 40px 20px;
   font-size: 0.9rem;

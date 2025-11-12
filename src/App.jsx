@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './layout/Layout';
 import Analytics from './pages/Analytics';
 import Home from './pages/Home';
+import AlertsTableDemo from './pages/AlertsTableDemo';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
           <Route path='analytics' element={<Analytics />} />
+          <Route path='alerts-table' element={<AlertsTableDemo />} />
         </Route>
       </Routes>
     </BrowserRouter>

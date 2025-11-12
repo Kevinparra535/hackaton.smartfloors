@@ -6,6 +6,7 @@ import FloorBlock from '../components/FloorBlock';
 import FloatingParticles from '../components/FloatingParticles';
 import GradientBackground from '../components/GradientBackground';
 import InteractiveWall from '../components/InteractiveWall';
+import InteractiveWallLeft from '../components/InteractiveWallLeft';
 import FloorInfoPanel from '../components/FloorInfoPanel';
 import FloorPredictionsPanel from '../components/PredictionsPanel';
 
@@ -88,9 +89,10 @@ const createPlaceholderFloor = (floorId) => ({
  * @param {Object} props
  * @param {Object} props.floorData - Real-time data for all floors (keyed by floorId)
  * @param {Object} props.predictions - ML predictions for all floors (keyed by floorId)
+ * @param {Array} props.alerts - Array of alerts for the alerts table
  * @param {Function} props.onFloorClick - Callback when a floor is clicked
  */
-const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
+const BuildingScene = ({ floorData, predictions, alerts = [], onFloorClick }) => {
   const cameraControlsRef = useRef();
   const lastClickedFloor = useRef(null);
   const { resetCamera } = useCameraZoom();
@@ -267,6 +269,8 @@ const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
         cameraControlsRef={cameraControlsRef}
         selectedFloorId={selectedFloorData?.floorId || null}
       />
+
+      <InteractiveWallLeft cameraControlsRef={cameraControlsRef} alerts={alerts} />
 
       {/* Floor Info Panel (Left) */}
 

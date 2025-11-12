@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiFilter, FiSearch } from 'react-icons/fi';
-import { fetchAlertsWithFilters } from '../api/rest';
+import { FiX, FiFilter, FiSearch, FiDownload } from 'react-icons/fi';
+import { fetchAlertsWithFilters, exportAlertsToCSV } from '../api/rest';
 
 // Styled Components
 const SidebarOverlay = styled(motion.div)`
@@ -148,6 +148,36 @@ const ClearFiltersButton = styled.button`
   &:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+  }
+`;
+
+const ExportButton = styled.button`
+  background: linear-gradient(135deg, #00ff88, #00b4d8);
+  border: none;
+  color: #000;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
   }
 `;
 
@@ -482,6 +512,56 @@ export default function AlertsSidebar({ isOpen, onClose, alerts: initialAlerts =
     filters.isPredictive !== 'all' ||
     filters.search.trim() !== '';
 
+  const handleExportCSV = async () => {
+    try {
+      console.log('🔄 Iniciando exportación CSV con filtros:', filters);
+      
+      // Build backend filters
+      const backendFilters = {};
+      if (filters.severity !== 'all') {
+        backendFilters.severity = filters.severity;
+      }
+      if (filters.floor !== 'all') {
+        backendFilters.floorId = parseInt(filters.floor, 10);
+      }
+      if (filters.type !== 'all') {
+        backendFilters.type = filters.type;
+      }
+      if (filters.isPredictive !== 'all') {
+        backendFilters.isPredictive = filters.isPredictive === 'true';
+      }
+
+      console.log('📤 Filtros procesados para backend:', backendFilters);
+
+      // Call export function
+      const blob = await exportAlertsToCSV(backendFilters);
+
+      console.log('✅ Blob recibido:', blob.size, 'bytes, tipo:', blob.type);
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Generate filename with current date
+      const date = new Date().toISOString().split('T')[0];
+      link.download = `alertas-smartfloors-${date}.csv`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      console.log('✅ Exportación completada exitosamente');
+    } catch (error) {
+      console.error('❌ Error completo en exportación:', error);
+      alert(`Error al exportar alertas: ${error.message}\n\nRevisa la consola para más detalles.`);
+    }
+  };
+
   // Extract unique values from alerts for filter options
   const uniqueFloors = [
     ...new Set(
@@ -540,9 +620,14 @@ export default function AlertsSidebar({ isOpen, onClose, alerts: initialAlerts =
                 <FiltersTitle>
                   <FiFilter /> Filtros
                 </FiltersTitle>
-                <ClearFiltersButton onClick={clearAllFilters} disabled={!hasActiveFilters}>
-                  Limpiar
-                </ClearFiltersButton>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <ExportButton onClick={handleExportCSV} title="Exportar alertas a CSV">
+                    <FiDownload /> Exportar CSV
+                  </ExportButton>
+                  <ClearFiltersButton onClick={clearAllFilters} disabled={!hasActiveFilters}>
+                    Limpiar
+                  </ClearFiltersButton>
+                </div>
               </FiltersHeader>
 
               {/* Severity Filter */}
@@ -565,12 +650,6 @@ export default function AlertsSidebar({ isOpen, onClose, alerts: initialAlerts =
                   onClick={() => updateFilter('severity', 'warning')}
                 >
                   Advertencias
-                </FilterChip>
-                <FilterChip
-                  $active={filters.severity === 'normal'}
-                  onClick={() => updateFilter('severity', 'normal')}
-                >
-                  Normales
                 </FilterChip>
               </FilterGroup>
 

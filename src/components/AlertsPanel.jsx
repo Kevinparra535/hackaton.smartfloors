@@ -33,13 +33,22 @@ export default function AlertsPanel({ alerts }) {
           <EmptyState>Sin alertas por el momento. Todos los sistemas normales.</EmptyState>
         ) : (
           alerts.map((alert) => {
-            // Prioritize severity over status, normalize values
-            const severityValue = alert.severity || alert.status || 'normal';
+            // Normalize severity value to lowercase for consistent comparison
+            const severityValue = (alert.severity || alert.status || 'normal').toLowerCase();
+            
+            // Debug: log severity values
+            console.log('🎨 [AlertsPanel] Alert severity:', {
+              original: alert.severity,
+              normalized: severityValue,
+              floorId: alert.floorId,
+              type: alert.type
+            });
 
             return (
               <AlertItem
                 key={alert.id}
                 $severity={severityValue}
+                $isPredictive={alert.isPredictive || false}
                 initial={{ opacity: 0, x: -20, height: 0 }}
                 animate={{ opacity: 1, x: 0, height: 'auto' }}
                 exit={{ opacity: 0, x: 20, height: 0 }}
@@ -57,7 +66,7 @@ export default function AlertsPanel({ alerts }) {
                     `${alert.type || 'Alerta'}: ${alert.value || 'Anomalía detectada'}`}
                   {alert.minutesAhead && ` (en ${alert.minutesAhead} min)`}
                 </AlertMessage>
-                {alert.recommendation && severityValue === 'danger' && (
+                {alert.recommendation && (severityValue === 'danger' || severityValue === 'critical') && (
                   <AlertMessage style={{ fontSize: '0.75rem', opacity: 0.8, marginTop: '0.3rem' }}>
                     💡 {alert.recommendation}
                   </AlertMessage>

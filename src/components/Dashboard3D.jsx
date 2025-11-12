@@ -7,12 +7,13 @@ import { Environment } from '@react-three/drei';
  * @param {Object} props
  * @param {Object} props.floorData - Floor data for visualization
  * @param {Object} props.predictions - Predictions data from ML model
+ * @param {Array} props.alerts - Array of alerts for the alerts table
  * @param {Function} props.onFloorClick - Callback for floor click events
  */
-const Dashboard3D = ({ floorData, predictions }) => {
+const Dashboard3D = ({ floorData, predictions, alerts = [] }) => {
   return (
     <Canvas shadows gl={{ antialias: true, alpha: false }} style={{}}>
-      <BuildingScene floorData={floorData} predictions={predictions} />
+      <BuildingScene floorData={floorData} predictions={predictions} alerts={alerts} />
     </Canvas>
   );
 };

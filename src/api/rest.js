@@ -160,6 +160,62 @@ export const checkHealth = async () => {
   return data;
 };
 
+/**
+ * Export alerts to CSV
+ * @param {object} filters - Filter parameters (same as fetchAlertsWithFilters)
+ * @returns {Promise<Blob>} CSV file blob
+ */
+export const exportAlertsToCSV = async (filters = {}) => {
+  const queryParams = new URLSearchParams();
+
+  // Add filters to query string
+  if (filters.severity && filters.severity !== 'all') {
+    queryParams.append('severity', filters.severity);
+  }
+  if (filters.floorId && filters.floorId !== 'all') {
+    queryParams.append('floorId', filters.floorId);
+  }
+  if (filters.type && filters.type !== 'all') {
+    queryParams.append('type', filters.type);
+  }
+  if (filters.limit) {
+    queryParams.append('limit', filters.limit);
+  }
+  if (filters.isPredictive !== undefined) {
+    queryParams.append('isPredictive', filters.isPredictive);
+  }
+  if (filters.startDate) {
+    queryParams.append('startDate', filters.startDate);
+  }
+  if (filters.endDate) {
+    queryParams.append('endDate', filters.endDate);
+  }
+
+  const queryString = queryParams.toString();
+  const endpoint = queryString ? `/export/alerts/csv?${queryString}` : '/export/alerts/csv';
+
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ CSV Export Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+        endpoint: `${BASE_URL}${endpoint}`
+      });
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+    return blob;
+  } catch (error) {
+    console.error(`❌ [REST API Error] ${endpoint}:`, error.message);
+    throw error;
+  }
+};
+
 // Export all functions
 export default {
   fetchAllFloors,
@@ -169,5 +225,6 @@ export default {
   fetchFloorPredictions,
   fetchAlerts,
   fetchAlertsWithFilters,
+  exportAlertsToCSV,
   checkHealth
 };
