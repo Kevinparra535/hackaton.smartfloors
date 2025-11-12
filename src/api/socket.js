@@ -98,7 +98,6 @@ export const subscribeToPredictions = (callback) => {
   const socketInstance = getSocket();
 
   socketInstance.on(PREDICTIONS, (predictions) => {
-    console.log('🔮 [Predictions Received]', predictions);
     callback(predictions);
   });
 

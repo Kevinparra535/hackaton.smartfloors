@@ -38,25 +38,27 @@ const Title = styled.h2`
 
 const AlertItem = styled(motion.div)`
   background: ${(props) => {
-    switch (props.$severity) {
-      case 'danger':
-        return 'rgba(255, 77, 79, 0.15)';
-      case 'warning':
-        return 'rgba(255, 217, 102, 0.15)';
-      default:
-        return 'rgba(0, 255, 136, 0.15)';
+    const severity = props.$severity;
+    // Map 'critical' from backend to 'danger' color
+    if (severity === 'danger' || severity === 'critical') {
+      return 'rgba(255, 77, 79, 0.15)';
     }
+    if (severity === 'warning') {
+      return 'rgba(255, 217, 102, 0.15)';
+    }
+    return 'rgba(0, 255, 136, 0.15)';
   }};
   border-left: 3px solid
     ${(props) => {
-      switch (props.$severity) {
-        case 'danger':
-          return '#ff4d4f';
-        case 'warning':
-          return '#ffd966';
-        default:
-          return '#00ff88';
+      const severity = props.$severity;
+      // Map 'critical' from backend to 'danger' color
+      if (severity === 'danger' || severity === 'critical') {
+        return '#ff4d4f';
       }
+      if (severity === 'warning') {
+        return '#ffd966';
+      }
+      return '#00ff88';
     }};
   padding: 12px;
   margin-bottom: 10px;

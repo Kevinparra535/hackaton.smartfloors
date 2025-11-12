@@ -191,6 +191,7 @@ export default function PredictionsPanel({ predictions, floorName }) {
 
   // Get available time intervals from first metric
   const firstMetric = Object.values(predictions)[0];
+
   const timeIntervals = firstMetric?.predictions?.map((p) => p.minutesAhead) || [
     10, 20, 30, 40, 50, 60
   ];
@@ -213,10 +214,15 @@ export default function PredictionsPanel({ predictions, floorName }) {
 
       <AnimatePresence mode='wait'>
         {Object.entries(predictions).map(([metric, data]) => {
-          if (metric === 'timestamp' || !data.predictions) return null;
+          // Filter out timestamp and non-metric fields
+          if (metric === 'timestamp' || !data || !data.predictions) {
+            return null;
+          }
 
           const selectedPrediction = data.predictions.find((p) => p.minutesAhead === selectedTime);
-          if (!selectedPrediction) return null;
+          if (!selectedPrediction) {
+            return null;
+          }
 
           const predictedValue = selectedPrediction[metric];
           const currentValue = data.currentValue;

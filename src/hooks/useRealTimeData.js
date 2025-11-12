@@ -7,6 +7,7 @@ import {
 } from '../api/socket';
 import { fetchAllFloors, fetchAlerts } from '../api/rest';
 import { getFloorStatus } from '../utils/webSocket.utils';
+import { mapSeverityToStatus } from '../utils/alertValidation';
 
 /**
  * Custom hook to manage real-time floor data and alerts
@@ -29,11 +30,26 @@ export const useRealTimeData = () => {
           ...floor,
           status
         };
+        
+        console.log(`🏢 [Floor ${floor.floorId}] Status: ${status}`, {
+          temp: floor.temperature,
+          humidity: floor.humidity,
+          power: floor.powerConsumption,
+          status
+        });
       });
 
       setFloorData(updatedFloors);
     } else if (data.floorId) {
       const status = getFloorStatus(data);
+      
+      console.log(`🏢 [Floor ${data.floorId}] Updated Status: ${status}`, {
+        temp: data.temperature,
+        humidity: data.humidity,
+        power: data.powerConsumption,
+        status
+      });
+      
       setFloorData((prev) => ({
         ...prev,
         [data.floorId]: {
@@ -45,27 +61,46 @@ export const useRealTimeData = () => {
   }, []);
 
   const handleAlert = useCallback((alertData) => {
+    console.log('🚨 [handleAlert] Received alert data:', alertData);
+
     if (alertData.alerts && Array.isArray(alertData.alerts)) {
       const allNewAlerts = [];
 
       alertData.alerts.forEach((alertGroup) => {
         if (alertGroup.anomalies && Array.isArray(alertGroup.anomalies)) {
           alertGroup.anomalies.forEach((anomaly, index) => {
-            allNewAlerts.push({
+            // Validate severity values
+            const normalizedSeverity = anomaly.severity?.toLowerCase();
+            const displaySeverity = mapSeverityToStatus(normalizedSeverity);
+            
+            const newAlert = {
               id: `${alertGroup.floorId}_${alertGroup.timestamp}_${index}`,
               floorId: alertGroup.floorId,
               floorName: alertGroup.floorName,
               type: anomaly.type,
-              severity: anomaly.severity,
+              severity: displaySeverity, // Use normalized severity
+              originalSeverity: anomaly.severity, // Keep original for debugging
               message: anomaly.message,
               value: anomaly.value,
               recommendation: anomaly.recommendation,
               timestamp: anomaly.timestamp || alertGroup.timestamp
+            };
+
+            console.log(`  ⚠️ [Anomaly] ${anomaly.type} - ${anomaly.severity} → ${displaySeverity}:`, {
+              floorId: alertGroup.floorId,
+              type: anomaly.type,
+              originalSeverity: anomaly.severity,
+              normalizedSeverity: displaySeverity,
+              value: anomaly.value,
+              message: anomaly.message
             });
+
+            allNewAlerts.push(newAlert);
           });
         }
       });
 
+      console.log(`✅ [handleAlert] Total alerts processed: ${allNewAlerts.length}`);
       setAlerts((prev) => [...allNewAlerts, ...prev].slice(0, 10));
     } else {
       console.warn('⚠️ [handleAlert] Invalid alert data - missing alerts array');
@@ -73,6 +108,8 @@ export const useRealTimeData = () => {
   }, []);
 
   const handlePredictions = useCallback((data) => {
+    ('🔮 [handlePredictions] Received predictions data:', data);
+
     if (data.predictions && Array.isArray(data.predictions)) {
       const updatedPredictions = {};
 
@@ -81,6 +118,8 @@ export const useRealTimeData = () => {
       });
 
       setPredictions(updatedPredictions);
+    } else {
+      console.warn('⚠️ [handlePredictions] Invalid predictions data structure:', data);
     }
   }, []);
 
@@ -110,12 +149,17 @@ export const useRealTimeData = () => {
           alertsData.forEach((alertGroup) => {
             if (alertGroup.anomalies && Array.isArray(alertGroup.anomalies)) {
               alertGroup.anomalies.forEach((anomaly, index) => {
+                // Normalize severity for consistency
+                const normalizedSeverity = anomaly.severity?.toLowerCase();
+                const displaySeverity = mapSeverityToStatus(normalizedSeverity);
+                
                 formattedAlerts.push({
                   id: `${alertGroup.floorId}_${alertGroup.timestamp}_${index}`,
                   floorId: alertGroup.floorId,
                   floorName: alertGroup.floorName,
                   type: anomaly.type,
-                  severity: anomaly.severity,
+                  severity: displaySeverity, // Use normalized severity
+                  originalSeverity: anomaly.severity,
                   message: anomaly.message,
                   value: anomaly.value,
                   recommendation: anomaly.recommendation,
@@ -126,6 +170,7 @@ export const useRealTimeData = () => {
           });
 
           formattedAlerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          console.log(`📊 [Initial Load] Loaded ${formattedAlerts.length} alerts`);
           setAlerts(formattedAlerts.slice(0, 10));
         } catch (alertError) {
           console.warn('⚠️ [useRealTimeData] Could not load alerts:', alertError.message);
