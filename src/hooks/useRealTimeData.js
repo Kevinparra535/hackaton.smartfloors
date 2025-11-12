@@ -7,59 +7,6 @@ import {
 } from '../api/socket';
 import { fetchAllFloors, fetchAlerts } from '../api/rest';
 
-const INITIAL_FLOOR_DATA = {
-  1: {
-    floorId: 1,
-    name: 'Piso 1',
-    occupancy: 0,
-    temperature: 22,
-    humidity: 45,
-    powerConsumption: 120,
-    status: 'normal',
-    timestamp: new Date().toISOString()
-  },
-  2: {
-    floorId: 2,
-    name: 'Piso 2',
-    occupancy: 0,
-    temperature: 22,
-    humidity: 45,
-    powerConsumption: 120,
-    status: 'normal',
-    timestamp: new Date().toISOString()
-  },
-  3: {
-    floorId: 3,
-    name: 'Piso 3',
-    occupancy: 0,
-    temperature: 22,
-    humidity: 45,
-    powerConsumption: 120,
-    status: 'normal',
-    timestamp: new Date().toISOString()
-  },
-  4: {
-    floorId: 4,
-    name: 'Piso 4',
-    occupancy: 0,
-    temperature: 22,
-    humidity: 45,
-    powerConsumption: 120,
-    status: 'normal',
-    timestamp: new Date().toISOString()
-  },
-  5: {
-    floorId: 5,
-    name: 'Piso 5',
-    occupancy: 0,
-    temperature: 22,
-    humidity: 45,
-    powerConsumption: 120,
-    status: 'normal',
-    timestamp: new Date().toISOString()
-  }
-};
-
 /**
  * Determine floor status based on environmental conditions
  * @param {Object} floor - Floor data

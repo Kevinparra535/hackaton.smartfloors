@@ -2,11 +2,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 
 const Panel = styled.div`
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
   background: rgba(26, 26, 26, 0.95);
   border-radius: 12px;
   padding: 20px;
   width: 320px;
-  max-height: 500px;
+  max-height: 50dvh;
   overflow-y: auto;
   border: 1px solid rgba(100, 108, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);

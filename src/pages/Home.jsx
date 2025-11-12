@@ -42,7 +42,49 @@ const Home = () => {
         <Dashboard3D floorData={floorData} onFloorHover={setHoveredFloor} />
       </CanvasWrapper>
 
-      <Sidebar>
+      <InfoPanel>
+        <InfoTitle>
+          {hoveredFloor
+            ? `${hoveredFloor.name || `Piso ${hoveredFloor.floorId}`} - Métricas`
+            : 'Pasa el cursor sobre un piso'}
+        </InfoTitle>
+        {displayedFloor ? (
+          <MetricGrid>
+            <MetricCard>
+              <MetricLabel>🌡️ Temperatura</MetricLabel>
+              <MetricValue>{displayedFloor.temperature}°C</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>💧 Humedad</MetricLabel>
+              <MetricValue>{displayedFloor.humidity}%</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>⚡ Consumo</MetricLabel>
+              <MetricValue>{displayedFloor.powerConsumption} kW</MetricValue>
+            </MetricCard>
+            <MetricCard>
+              <MetricLabel>� Ocupación</MetricLabel>
+              <MetricValue>{displayedFloor.occupancy}%</MetricValue>
+            </MetricCard>
+            <MetricCard style={{ gridColumn: 'span 2' }}>
+              <MetricLabel>📊 Estado</MetricLabel>
+              <MetricValue style={{ fontSize: '1rem', textTransform: 'capitalize' }}>
+                {displayedFloor.status === 'normal' && '✅ Normal'}
+                {displayedFloor.status === 'warning' && '⚠️ Advertencia'}
+                {displayedFloor.status === 'danger' && '🚨 Peligro'}
+              </MetricValue>
+            </MetricCard>
+          </MetricGrid>
+        ) : (
+          <EmptyInfo>Pasa el cursor sobre un piso para ver las métricas detalladas</EmptyInfo>
+        )}
+      </InfoPanel>
+
+      <PredictionsPanel predictions={displayedPredictions} floorName={displayedFloorName} />
+
+      <AlertsPanel alerts={alerts} />
+
+      {/* <Sidebar>
         <InfoPanel>
           <InfoTitle>
             {hoveredFloor
@@ -84,7 +126,7 @@ const Home = () => {
         <PredictionsPanel predictions={displayedPredictions} floorName={displayedFloorName} />
 
         <AlertsPanel alerts={alerts} />
-      </Sidebar>
+      </Sidebar> */}
     </MainContent>
   );
 };

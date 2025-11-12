@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -21,6 +21,19 @@ export default function FloorBlock({ data, position, onHover }) {
   const materialRef = useRef();
 
   const color = STATUS_COLORS[data.status] || STATUS_COLORS.normal;
+
+  // Debug: Log when floor data changes
+  console.log(`🏗️ [FloorBlock ${data.floorId}] Rendered with status: ${data.status}, color: ${color}`, data);
+
+  // Monitor color changes for debugging
+  useEffect(() => {
+    console.log(`🎨 [FloorBlock ${data.floorId}] Color updated to: ${color}`);
+    if (materialRef.current) {
+      materialRef.current.color.set(color);
+      materialRef.current.emissive.set(color);
+      materialRef.current.needsUpdate = true;
+    }
+  }, [color, data.floorId]);
 
   // Breathing animation when status is warning or danger
   useFrame((state) => {

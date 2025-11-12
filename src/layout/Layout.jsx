@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Header from './Header';
+import SocketDebugger from '../components/SocketDebugger';
 
 import { useRealTimeData } from '../hooks/useRealTimeData';
 
@@ -74,6 +75,7 @@ const Layout = () => {
       <Main>
         <Outlet context={{ floorData, predictions, alerts, isLoading }} />
       </Main>
+      <SocketDebugger />
     </LayoutContainer>
   );
 };

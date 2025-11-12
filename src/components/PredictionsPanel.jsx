@@ -3,13 +3,15 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Panel = styled.div`
+  position: absolute;
+  left: 10px;
   background: rgba(26, 26, 26, 0.95);
   border-radius: 12px;
   padding: 20px;
   width: 320px;
   border: 1px solid rgba(100, 108, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  max-height: 500px;
+  max-height: 100dvh;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
