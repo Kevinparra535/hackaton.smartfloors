@@ -1,7 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import { getFloorHeatConfig } from '../config/heatLayerConfig';
+import {
+  calculateHeatState,
+  HEAT_LAYER_COLORS,
+  HEAT_LAYER_SETTINGS
+} from '../config/heatLayerConfig';
 import { getVolumetricConfig, VISUALIZATION_MODES } from '../config/visualizationModes';
 import VolumetricFog from './VolumetricFog';
 
@@ -23,13 +27,15 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
     return localStorage.getItem('smartfloors-viz-mode') || VISUALIZATION_MODES.VOLUMETRIC;
   });
 
-  // Get heat layer configuration for this floor
-  const heatConfig = getFloorHeatConfig(data.floorId);
-  const { state, colors, settings, shouldPulse } = heatConfig;
+  // Calculate heat state dynamically based on real-time metrics
+  const heatState = calculateHeatState(data);
+  const colors = HEAT_LAYER_COLORS[heatState];
+  const settings = HEAT_LAYER_SETTINGS;
+  const shouldPulse = heatState === 'critical' || heatState === 'combined_risk';
 
   // Get volumetric configuration
-  const volumetricData = getVolumetricConfig(state);
-  
+  const volumetricData = getVolumetricConfig(heatState);
+
   // Determinar qué mostrar basado en el modo actual
   const showVolumetric = visualizationMode === VISUALIZATION_MODES.VOLUMETRIC;
   const showHeatLayer = visualizationMode === VISUALIZATION_MODES.HEAT_LAYER;
@@ -43,22 +49,11 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
     };
 
     window.addEventListener('visualizationModeChange', handleModeChange);
-    
+
     return () => {
       window.removeEventListener('visualizationModeChange', handleModeChange);
     };
   }, [data.floorId]);
-
-  // Log heat layer state for debugging
-  useEffect(() => {
-    console.log(`🌡️ [FloorBlock ${data.floorId}] Heat Layer State:`, {
-      floorId: data.floorId,
-      state,
-      colors,
-      shouldPulse,
-      opacity: settings.mainOpacity
-    });
-  }, [data.floorId, state, colors, shouldPulse, settings.mainOpacity]);
 
   // Handle hover state
   const handlePointerOver = () => {
@@ -84,12 +79,12 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
   // Handle click for zoom functionality
   const handleClick = (event) => {
     event.stopPropagation(); // Prevent event bubbling
-    
+
     if (onClick) {
-      onClick({ 
-        floorData: data, 
+      onClick({
+        floorData: data,
         floorY: position,
-        floorId: data.floorId 
+        floorId: data.floorId
       });
     }
   };
@@ -110,14 +105,14 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
     if (shouldPulse) {
       // Pulse animation using configured speed
       const pulse = Math.sin(state.clock.elapsedTime * settings.pulseSpeed) * 0.3 + 0.7;
-      materialRef.current.emissiveIntensity = pulse * settings.emissiveIntensity[heatConfig.state];
-      
+      materialRef.current.emissiveIntensity = pulse * settings.emissiveIntensity[heatState];
+
       // Subtle scale pulse
       meshRef.current.scale.x = 1 + Math.sin(state.clock.elapsedTime * settings.pulseSpeed) * 0.02;
       meshRef.current.scale.z = 1 + Math.sin(state.clock.elapsedTime * settings.pulseSpeed) * 0.02;
     } else {
       // Static emissive intensity for non-pulsing states
-      materialRef.current.emissiveIntensity = settings.emissiveIntensity[heatConfig.state];
+      materialRef.current.emissiveIntensity = settings.emissiveIntensity[heatState];
       meshRef.current.scale.set(1, 1, 1);
     }
   });
@@ -139,7 +134,7 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
           ref={materialRef}
           color={showHeatLayer ? colors.primary : '#1a1a1a'}
           emissive={showHeatLayer ? colors.emissive : '#000000'}
-          emissiveIntensity={showHeatLayer ? settings.emissiveIntensity[state] : 0}
+          emissiveIntensity={showHeatLayer ? settings.emissiveIntensity[heatState] : 0}
           metalness={0.6}
           roughness={0.3}
           envMapIntensity={1}
@@ -152,21 +147,13 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
       {showHeatLayer && (
         <mesh scale={[1.05, 1.05, 1.05]}>
           <boxGeometry args={[3, 1.5, 3]} />
-          <meshBasicMaterial
-            color={colors.secondary}
-            transparent
-            opacity={0.15}
-            wireframe
-          />
+          <meshBasicMaterial color={colors.secondary} transparent opacity={0.15} wireframe />
         </mesh>
       )}
 
       {/* Volumetric Fog - Internal thermal smoke/fog */}
       {showVolumetric && (
-        <VolumetricFog 
-          config={volumetricData.config} 
-          settings={volumetricData.settings}
-        />
+        <VolumetricFog config={volumetricData.config} settings={volumetricData.settings} />
       )}
 
       {/* Floor label with better visibility */}
@@ -182,26 +169,12 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
         {data.name || `Piso ${data.floorId}`}
       </Text>
 
-      {/* Heat state indicator sphere */}
-      {showHeatLayer && (
-        <mesh position={[1.6, 0, 0]}>
-          <sphereGeometry args={[0.15, 16, 16]} />
-          <meshStandardMaterial 
-            color={colors.primary} 
-            emissive={colors.emissive} 
-            emissiveIntensity={settings.emissiveIntensity[state] * 2}
-            metalness={0.8}
-            roughness={0.2}
-          />
-        </mesh>
-      )}
-
       {/* Ambient light based on heat state */}
       {showHeatLayer && (
-        <pointLight 
-          position={[0, 0, 0]} 
-          color={colors.emissive} 
-          intensity={settings.pointLightIntensity[state]}
+        <pointLight
+          position={[0, 0, 0]}
+          color={colors.emissive}
+          intensity={settings.pointLightIntensity[heatState]}
           distance={settings.pointLightDistance}
           decay={2}
         />
@@ -210,15 +183,15 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
       {/* Heat state label (small text showing current state) */}
       {showHeatLayer && (
         <Text
-          position={[0, -0.9, 0]}
-          fontSize={0.15}
-          color={colors.primary}
+          position={[0, -0.3, 1.6]}
+          fontSize={0.10}
+          color='#ffffff'
           anchorX='center'
           anchorY='middle'
-          outlineWidth={0.01}
+          outlineWidth={0.02}
           outlineColor='#000000'
         >
-          {state.replace('_', ' ').toUpperCase()}
+          {heatState.replace('_', ' ').toUpperCase()}
         </Text>
       )}
     </group>

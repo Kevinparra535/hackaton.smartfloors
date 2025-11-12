@@ -15,10 +15,33 @@ export const useCameraZoom = () => {
   const isAnimating = useRef(false);
   const animationProgress = useRef(0);
   const focusedFloorId = useRef(null); // Track currently focused floor
+  const isWallFocused = useRef(false); // Track if wall is focused
 
   // Store initial camera state for reset
   const initialPosition = useRef(new THREE.Vector3(10, 6, 10));
   const initialLookAt = useRef(new THREE.Vector3(0, 0, 0));
+
+  /**
+   * Reset camera to initial overview position
+   */
+  const resetCamera = useCallback(() => {
+    if (!camera) return;
+
+    targetPosition.current.copy(initialPosition.current);
+    targetLookAt.current.copy(initialLookAt.current);
+
+    // Re-enable controls if they were disabled
+    if (controls) {
+      controls.enabled = true;
+    }
+
+    // Clear focused floor and wall
+    focusedFloorId.current = null;
+    isWallFocused.current = false;
+
+    isAnimating.current = true;
+    animationProgress.current = 0;
+  }, [camera, controls]);
 
   /**
    * Zoom camera to focus on a specific floor
@@ -36,41 +59,71 @@ export const useCameraZoom = () => {
         return;
       }
 
-      // Calculate target position - perfectly centered on the selected floor
-      // Camera positioned directly in front, at floor height, closer for better focus
-      const cameraDistance = 5; // Distance from the floor
-      const cameraHeight = 0.3; // Slight elevation above floor center for better view
+      // Re-enable controls when focusing on floor (not wall)
+      if (controls) {
+        controls.enabled = true;
+      }
 
-      targetPosition.current.set(0, floorY + cameraHeight, cameraDistance);
+      // Position camera to show building on the left side of canvas with perspective
+      // Camera positioned to the RIGHT and FORWARD, looking LEFT towards the building
+      targetPosition.current.set(8, floorY, 8);
 
-      // Look directly at the center of the selected floor
-      targetLookAt.current.set(0, floorY, 0);
+      // Look at the floor slightly to the left of center for left-side framing
+      targetLookAt.current.set(-1, floorY, 0);
 
       // Track the focused floor
       focusedFloorId.current = floorId;
+      isWallFocused.current = false;
 
       // Start animation
       isAnimating.current = true;
       animationProgress.current = 0;
     },
-    [camera]
-  ); // Removed controls from dependencies
+    [camera, resetCamera, controls]
+  );
 
   /**
-   * Reset camera to initial overview position
+   * Zoom camera to a specific position (for wall, etc.)
+   * @param {Array} position - [x, y, z] position to focus on
    */
-  const resetCamera = useCallback(() => {
-    if (!camera) return;
+  const zoomToPosition = useCallback(
+    (position) => {
+      if (!camera) return;
 
-    targetPosition.current.copy(initialPosition.current);
-    targetLookAt.current.copy(initialLookAt.current);
+      // Wall is at position [15, 0, 0], vertical plane rotated 90° in Y
+      const wallX = position[0];
+      const wallY = position[1];
+      const wallZ = position[2];
 
-    // Clear focused floor
-    focusedFloorId.current = null;
+      // Position camera very close to fill the screen with HTML content
+      const cameraDistance = 6;
 
-    isAnimating.current = true;
-    animationProgress.current = 0;
-  }, [camera]);
+      // Camera positioned to the LEFT of the wall (negative X), looking RIGHT towards it
+      targetPosition.current.set(
+        wallX - cameraDistance, // To the left of the wall (15 - 6 = 9)
+        wallY,
+        wallZ
+      );
+
+      // Look directly at the wall center
+      targetLookAt.current.set(wallX, wallY, wallZ);
+
+      console.log('🎯 Wall zoom setup:');
+      console.log('  Camera target position:', targetPosition.current);
+      console.log('  Camera lookAt target:', targetLookAt.current);
+      console.log('  Current camera position:', camera.position);
+      console.log('  Current controls target:', controls?.target);
+
+      // Clear focused floor since we're focusing on wall
+      focusedFloorId.current = null;
+      isWallFocused.current = true;
+
+      // Start animation
+      isAnimating.current = true;
+      animationProgress.current = 0;
+    },
+    [camera, controls]
+  );
 
   // Animation frame - smooth lerp to target
   useFrame(() => {
@@ -86,7 +139,10 @@ export const useCameraZoom = () => {
     // Interpolate camera position
     camera.position.lerp(targetPosition.current, eased * 0.1);
 
-    // Interpolate OrbitControls target (what camera looks at) - only if controls exist
+    // Update camera to look at target directly (bypassing OrbitControls)
+    camera.lookAt(targetLookAt.current);
+
+    // Also update OrbitControls target if it exists
     if (controls?.target) {
       controls.target.lerp(targetLookAt.current, eased * 0.1);
     }
@@ -101,14 +157,21 @@ export const useCameraZoom = () => {
 
       // Snap to exact position to avoid floating point drift
       camera.position.copy(targetPosition.current);
+      camera.lookAt(targetLookAt.current);
       if (controls?.target) {
         controls.target.copy(targetLookAt.current);
+      }
+
+      // If focused on wall, disable OrbitControls to prevent drift
+      if (isWallFocused.current && controls) {
+        controls.enabled = false;
       }
     }
   });
 
   return {
     zoomToFloor,
+    zoomToPosition,
     resetCamera,
     isAnimating: isAnimating.current
   };

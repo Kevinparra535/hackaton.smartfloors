@@ -1,10 +1,18 @@
-import { OrbitControls, Environment, PerspectiveCamera, Stars } from '@react-three/drei';
-import { EffectComposer, Bloom, DepthOfField, Vignette } from '@react-three/postprocessing';
+import {
+  OrbitControls,
+  Environment,
+  PerspectiveCamera,
+  Stars,
+  SpotLight
+} from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import FloorBlock from '../components/FloorBlock';
 import FloatingParticles from '../components/FloatingParticles';
 import GradientBackground from '../components/GradientBackground';
+import InteractiveWall from '../components/InteractiveWall';
 import { useCameraZoom } from '../hooks/useCameraZoom';
 import { useRef } from 'react';
+import * as THREE from 'three';
 
 /**
  * BuildingScene - 3D scene containing all floor blocks with immersive effects
@@ -42,7 +50,7 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
   return (
     <>
       {/* Camera setup with better positioning */}
-      <PerspectiveCamera makeDefault position={[10, 6, 10]} fov={55} />
+      <PerspectiveCamera makeDefault position={[10, 6, 5]} fov={55} />
 
       {/* Fog for depth and atmosphere */}
       <fog attach='fog' args={['#0a0a0a', 5, 30]} />
@@ -67,10 +75,26 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
         color='#ffffff'
       />
 
+      <SpotLight
+        position={[0, 20, 0]}
+        target-position={[15, 0, 0]}
+        castShadow
+        penumbra={1}
+        distance={15}
+        angle={0.4}
+        attenuation={3}
+        anglePower={5}
+        intensity={3}
+        color='#646cff'
+      />
+
       {/* Immersive Background Elements */}
       <GradientBackground />
       <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
       <FloatingParticles count={150} />
+
+      {/* Interactive wall - Right side with integrated 3D HTML */}
+      <InteractiveWall />
 
       {/* Environment for reflections */}
       <Environment preset='city' background={false} />
@@ -134,7 +158,7 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
         enablePan={true}
         enableZoom={true}
         enableRotate={true}
-        minDistance={8}
+        minDistance={0}
         maxDistance={25}
         maxPolarAngle={Math.PI / 2}
         autoRotate={false}
