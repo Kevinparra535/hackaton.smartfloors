@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json.schemastore.org/package",
   "name": "hackaton.smartfloors",
   "private": true,
   "version": "0.0.0",
@@ -13,27 +14,34 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@kalimahapps/vue-icons": "^1.9.5",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.4.0",
     "framer-motion": "^12.23.24",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^7.9.5",
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.19",
     "three": "^0.181.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.1.0",
+    "autoprefixer": "^10.4.22",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "postcss": "^8.5.6",
     "prettier": "3.6.2",
+    "tailwindcss": "^3.4.18",
     "vite": "^7.2.2"
   }
 }

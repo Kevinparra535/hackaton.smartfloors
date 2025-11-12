@@ -1,11 +1,17 @@
-/* SmartFloors AI - Global Styles */
 
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+/* Estilos de Reinicio (Reset) */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Variables Globales y Configuración de Fuente/Color */
 :root {
   font-family:
     'Inter',
@@ -33,6 +39,7 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Dimensiones base de la App */
 html,
 body,
 #root {
@@ -40,9 +47,10 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: hidden; /* Esto es clave para las apps de pantalla completa */
 }
 
+/* Estilos del Body (contenedor principal) */
 body {
   margin: 0;
   display: flex;
@@ -52,6 +60,7 @@ body {
   background: #0a0a0a;
 }
 
+/* Estilos de Tipografía */
 h1,
 h2,
 h3,
@@ -62,6 +71,7 @@ h6 {
   line-height: 1.2;
 }
 
+/* Estilos para Botones (Componente base) */
 button {
   border-radius: 8px;
   border: 1px solid rgba(100, 108, 255, 0.3);
@@ -86,6 +96,7 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+/* Estilos para Enlaces */
 a {
   font-weight: 500;
   color: #646cff;
@@ -96,7 +107,7 @@ a:hover {
   color: #535bf2;
 }
 
-/* Scrollbar styling */
+/* Estilos de la Barra de Desplazamiento (Scrollbar styling) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -115,35 +126,3 @@ a:hover {
   background: rgba(100, 108, 255, 0.7);
 }
 
-/* Utility classes */
-.text-center {
-  text-align: center;
-}
-
-.flex {
-  display: flex;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.gap-1 {
-  gap: 0.5rem;
-}
-
-.gap-2 {
-  gap: 1rem;
-}
-
-.gap-3 {
-  gap: 1.5rem;
-}
