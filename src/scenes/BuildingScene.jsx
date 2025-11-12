@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Environment, PerspectiveCamera, Stars, CameraControls, Html } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 
@@ -98,6 +98,41 @@ const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
   const [selectedFloorData, setSelectedFloorData] = useState(null);
   const [infoPanelPosition, setInfoPanelPosition] = useState([0, 0, 0]);
   const [predictionsPanelPosition, setPredictionsPanelPosition] = useState([0, 0, 0]);
+
+  // ============================================================================
+  // Effects
+  // ============================================================================
+
+  /**
+   * Update selected floor data when floorData or predictions change
+   * This ensures panels show real-time updates even when a floor is selected
+   */
+  useEffect(() => {
+    if (!selectedFloorData || !lastClickedFloor.current) return;
+
+    const selectedFloorId = lastClickedFloor.current;
+    const updatedFloorData = floorData?.[selectedFloorId];
+    const updatedPredictions = predictions?.[selectedFloorId] || null;
+
+    if (updatedFloorData) {
+      console.log(
+        '🔄 [BuildingScene] Updating selected floor data for floor',
+        selectedFloorId,
+        ':',
+        updatedFloorData
+      );
+      console.log('🔮 [BuildingScene] Updated predictions:', updatedPredictions);
+
+      setSelectedFloorData({
+        ...updatedFloorData,
+        predictions: updatedPredictions
+      });
+    }
+  }, [floorData, predictions, selectedFloorData]);
+
+  // ============================================================================
+  // Event Handlers
+  // ============================================================================
 
   /**
    * Handle floor click - zoom camera and show panels

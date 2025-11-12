@@ -9,14 +9,10 @@ import { Environment } from '@react-three/drei';
  * @param {Object} props.predictions - Predictions data from ML model
  * @param {Function} props.onFloorClick - Callback for floor click events
  */
-const Dashboard3D = ({ floorData, predictions, onFloorClick }) => {
+const Dashboard3D = ({ floorData, predictions }) => {
   return (
     <Canvas shadows gl={{ antialias: true, alpha: false }} style={{}}>
-      <BuildingScene
-        floorData={floorData}
-        predictions={predictions}
-        onFloorClick={onFloorClick}
-      />
+      <BuildingScene floorData={floorData} predictions={predictions} />
     </Canvas>
   );
 };

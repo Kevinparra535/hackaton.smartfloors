@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import {
   Panel,
@@ -60,10 +60,17 @@ const getMetricUnit = (metric) => {
 export default function FloorPredictionsPanel({ predictions, floorName }) {
   const [selectedTime, setSelectedTime] = useState(60); // Default to 60 minutes ahead
 
+  // Debug: Log when predictions change
+  useEffect(() => {
+    if (predictions && Object.keys(predictions).length > 0) {
+      console.log('[PredictionsPanel] Predictions updated for', floorName, ':', predictions);
+    }
+  }, [predictions, floorName]);
+
   if (!predictions || Object.keys(predictions).length === 0) {
     return (
       <Panel>
-        <Title>🔮 Predicciones</Title>
+        <Title>Predicciones</Title>
         <EmptyState>
           {floorName
             ? 'No hay predicciones disponibles para este piso'
@@ -82,7 +89,7 @@ export default function FloorPredictionsPanel({ predictions, floorName }) {
 
   return (
     <Panel>
-      <Title>🔮 Predicciones - {floorName}</Title>
+      <Title>Predicciones - {floorName}</Title>
 
       <TimeSelector>
         {timeIntervals.map((minutes) => (

@@ -58,23 +58,23 @@ export const TimeButton = styled.button`
   border: 1px solid ${scssTokens.colors.primary};
   background: ${({ $active }) =>
     $active ? scssTokens.colors.primary : 'rgba(100, 108, 255, 0.1)'};
-  color: ${({ $active, theme }) => ($active ? theme.text.primary : theme.text.secondary)};
+  color: ${({ $active }) => ($active ? scssTokens.colors.white : scssTokens.colors.variant)};
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
 
   &:hover {
-    border-color: ${({ theme }) => theme.colors.primary};
+    border-color: ${scssTokens.colors.primary};
     background: rgba(100, 108, 255, 0.2);
   }
 `;
 
 export const MetricCard = styled(motion.div)`
-  background: ${({ theme }) => theme.colors.primaryLight};
+  background: ${scssTokens.colors.bg_card};
   padding: 12px;
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.border.subtle};
+  border: 1px solid ${scssTokens.colors.bg_light};
   margin-bottom: 12px;
 `;
 
@@ -86,7 +86,7 @@ export const MetricHeader = styled.div`
 `;
 
 export const MetricName = styled.div`
-  color: ${({ theme }) => theme.text.primary};
+  color: ${scssTokens.colors.white};
   font-weight: 600;
   font-size: 0.9rem;
   display: flex;
@@ -95,10 +95,10 @@ export const MetricName = styled.div`
 `;
 
 export const Confidence = styled.div`
-  color: ${({ $value, theme }) => {
-    if ($value >= 0.9) return theme.colors.success;
-    if ($value >= 0.7) return theme.colors.warning;
-    return theme.colors.danger;
+  color: ${({ $value }) => {
+    if ($value >= 0.9) return scssTokens.colors.success;
+    if ($value >= 0.7) return scssTokens.colors.warning;
+    return scssTokens.colors.danger;
   }};
   font-size: 0.75rem;
   font-weight: 600;
@@ -112,23 +112,23 @@ export const ValueRow = styled.div`
 `;
 
 export const Label = styled.span`
-  color: ${({ theme }) => theme.text.dimmed};
+  color: ${scssTokens.colors.variant};
 `;
 
 export const Value = styled.span`
-  color: ${({ theme }) => theme.text.primary};
+  color: ${scssTokens.colors.white};
   font-weight: 600;
 `;
 
 export const PredictedValue = styled(Value)`
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${scssTokens.colors.primary};
 `;
 
 export const Trend = styled.span`
-  color: ${({ $direction, theme }) => {
-    if ($direction === 'up') return theme.colors.danger;
-    if ($direction === 'down') return theme.colors.success;
-    return theme.colors.warning;
+  color: ${({ $direction }) => {
+    if ($direction === 'up') return scssTokens.colors.danger;
+    if ($direction === 'down') return scssTokens.colors.success;
+    return scssTokens.colors.warning;
   }};
   font-size: 1rem;
 `;

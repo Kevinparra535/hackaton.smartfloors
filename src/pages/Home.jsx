@@ -7,15 +7,13 @@ import { useOutletContext } from 'react-router-dom';
 const Home = () => {
   const { floorData, predictions, currentMode } = useOutletContext();
 
-  const handleFloorClick = (clickData) => {
-    // Floor click handled in BuildingScene - could add additional logic here
-    console.log('Floor clicked:', clickData?.floorData?.name);
-  };
-
   return (
     <MainContent>
       <CanvasWrapper>
-        <Dashboard3D floorData={floorData} predictions={predictions} onFloorClick={handleFloorClick} />
+        <Dashboard3D
+          floorData={floorData}
+          predictions={predictions}
+        />
       </CanvasWrapper>
 
       {/* Color Legend - Leyenda de estados */}
