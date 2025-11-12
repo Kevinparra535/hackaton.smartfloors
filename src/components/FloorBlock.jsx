@@ -18,8 +18,30 @@ const STATUS_COLORS = {
 export default function FloorBlock({ data, position, onHover }) {
   const meshRef = useRef();
   const materialRef = useRef();
+  const isHoveredRef = useRef(false);
 
   const color = STATUS_COLORS[data.status] || STATUS_COLORS.normal;
+
+  // Handle hover state
+  const handlePointerOver = () => {
+    if (!isHoveredRef.current) {
+      isHoveredRef.current = true;
+      document.body.style.cursor = 'pointer';
+      if (onHover) {
+        onHover(data);
+      }
+    }
+  };
+
+  const handlePointerOut = () => {
+    if (isHoveredRef.current) {
+      isHoveredRef.current = false;
+      document.body.style.cursor = 'default';
+      if (onHover) {
+        onHover(null);
+      }
+    }
+  };
 
   // Monitor color changes for debugging
   useEffect(() => {
@@ -47,35 +69,73 @@ export default function FloorBlock({ data, position, onHover }) {
 
   return (
     <group position={[0, position, 0]}>
-      {/* Floor block */}
-      <mesh ref={meshRef} onPointerOver={() => onHover(data)} onPointerOut={() => onHover(null)}>
-        <boxGeometry args={[3, 1, 3]} />
+      {/* Floor block with enhanced materials */}
+      <mesh
+        ref={meshRef}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+        onPointerMove={handlePointerOver}
+        castShadow
+        receiveShadow
+      >
+        <boxGeometry args={[3, 1.5, 3]} />
         <meshStandardMaterial
           ref={materialRef}
           color={color}
           emissive={color}
           emissiveIntensity={0.2}
-          metalness={0.3}
-          roughness={0.4}
+          metalness={0.6}
+          roughness={0.3}
+          envMapIntensity={1}
+          transparent
+          opacity={0.95}
         />
       </mesh>
 
-      {/* Floor label */}
+      {/* Outer glow effect */}
+      <mesh scale={[1.05, 1.05, 1.05]}>
+        <boxGeometry args={[3, 1.5, 3]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.1}
+          wireframe
+        />
+      </mesh>
+
+      {/* Floor label with better visibility */}
       <Text
         position={[0, 0, 1.6]}
         fontSize={0.3}
         color='#ffffff'
         anchorX='center'
         anchorY='middle'
+        outlineWidth={0.02}
+        outlineColor='#000000'
       >
         {data.name || `Piso ${data.floorId}`}
       </Text>
 
-      {/* Status indicator */}
+      {/* Enhanced status indicator with pulsing glow */}
       <mesh position={[1.6, 0, 0]}>
         <sphereGeometry args={[0.15, 16, 16]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1} />
+        <meshStandardMaterial 
+          color={color} 
+          emissive={color} 
+          emissiveIntensity={2}
+          metalness={0.8}
+          roughness={0.2}
+        />
       </mesh>
+
+      {/* Ambient light ring around floor */}
+      <pointLight 
+        position={[0, 0, 0]} 
+        color={color} 
+        intensity={data.status === 'danger' ? 2 : data.status === 'warning' ? 1.5 : 0.8}
+        distance={5}
+        decay={2}
+      />
     </group>
   );
 }

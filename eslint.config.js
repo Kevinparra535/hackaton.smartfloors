@@ -68,7 +68,27 @@ export default [
             'wireframe',
             'attach',
             'geometry',
-            'material'
+            'material',
+            'color',
+            'fog',
+            'transparent',
+            'opacity',
+            'side',
+            'sizeAttenuation',
+            'blending',
+            'count',
+            'array',
+            'itemSize',
+            'angle',
+            'penumbra',
+            'shadow-mapSize-width',
+            'shadow-mapSize-height',
+            'envMapIntensity',
+            'background',
+            'distance',
+            'decay',
+            'outlineWidth',
+            'outlineColor'
           ]
         }
       ]

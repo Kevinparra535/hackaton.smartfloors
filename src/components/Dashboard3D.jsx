@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber';
 import BuildingScene from '../scenes/BuildingScene';
+import { Environment } from '@react-three/drei';
 
 /**
  * Dashboard3D component - Canvas wrapper for 3D visualization
@@ -9,13 +10,7 @@ import BuildingScene from '../scenes/BuildingScene';
  */
 const Dashboard3D = ({ floorData, onFloorHover }) => {
   return (
-    <Canvas
-      shadows
-      gl={{ antialias: true, alpha: false }}
-      style={{
-        background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
-      }}
-    >
+    <Canvas shadows gl={{ antialias: true, alpha: false }} style={{}}>
       <BuildingScene floorData={floorData} onFloorHover={onFloorHover} />
     </Canvas>
   );
