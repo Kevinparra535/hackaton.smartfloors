@@ -100,7 +100,7 @@ const Home = () => {
         )}
       </InfoPanel>
 
-      <PredictionsPanel predictions={displayedPredictions} floorName={displayedFloorName} />
+      {/* <PredictionsPanel predictions={displayedPredictions} floorName={displayedFloorName} /> */}
 
       {/* <AlertsPanel alerts={alerts} /> */}
     </MainContent>

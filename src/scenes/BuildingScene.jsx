@@ -16,7 +16,7 @@ import { useRef } from 'react';
 const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
   const controlsRef = useRef();
   const { zoomToFloor, resetCamera } = useCameraZoom();
-  
+
   const handleHover = (data) => {
     onFloorHover(data);
   };
@@ -25,7 +25,7 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
     if (onFloorClick) {
       onFloorClick(clickData);
     }
-    
+
     // Zoom camera to the clicked floor (or reset if same floor)
     if (clickData?.floorY !== undefined && clickData?.floorId !== undefined) {
       zoomToFloor(clickData.floorY, clickData.floorId);
@@ -106,9 +106,9 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
           ))}
 
       {/* Ground plane with enhanced materials */}
-      <mesh 
-        rotation={[-Math.PI / 2, 0, 0]} 
-        position={[0, -6, 0]} 
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, -6, 0]}
         receiveShadow
         onDoubleClick={resetCamera}
       >

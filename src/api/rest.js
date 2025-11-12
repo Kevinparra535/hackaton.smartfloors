@@ -100,6 +100,56 @@ export const fetchAlerts = async () => {
 };
 
 /**
+ * Fetch alerts with filters
+ * @param {object} filters - Filter parameters
+ * @param {string} filters.severity - Severity filter (critical, warning, info)
+ * @param {number} filters.floorId - Floor ID filter (1-100)
+ * @param {string} filters.type - Anomaly type filter
+ * @param {number} filters.limit - Maximum results (1-100)
+ * @param {boolean} filters.isPredictive - Filter predictive alerts
+ * @param {string} filters.startDate - Start date (ISO 8601)
+ * @param {string} filters.endDate - End date (ISO 8601)
+ * @returns {Promise<object>} Alerts response with data and metadata
+ */
+export const fetchAlertsWithFilters = async (filters = {}) => {
+  const queryParams = new URLSearchParams();
+
+  // Add filters to query string
+  if (filters.severity && filters.severity !== 'all') {
+    queryParams.append('severity', filters.severity);
+  }
+  if (filters.floorId && filters.floorId !== 'all') {
+    queryParams.append('floorId', filters.floorId);
+  }
+  if (filters.type && filters.type !== 'all') {
+    queryParams.append('type', filters.type);
+  }
+  if (filters.limit) {
+    queryParams.append('limit', filters.limit);
+  }
+  if (filters.isPredictive !== undefined) {
+    queryParams.append('isPredictive', filters.isPredictive);
+  }
+  if (filters.startDate) {
+    queryParams.append('startDate', filters.startDate);
+  }
+  if (filters.endDate) {
+    queryParams.append('endDate', filters.endDate);
+  }
+
+  const queryString = queryParams.toString();
+  const endpoint = queryString ? `/alerts?${queryString}` : '/alerts';
+
+  const response = await apiFetch(endpoint);
+
+  return {
+    alerts: response.data.alerts,
+    count: response.data.count,
+    filters: response.data.filters || {}
+  };
+};
+
+/**
  * Check server health
  * @returns {Promise<object>} Health status object
  */
@@ -118,5 +168,6 @@ export default {
   fetchFloorHistory,
   fetchFloorPredictions,
   fetchAlerts,
+  fetchAlertsWithFilters,
   checkHealth
 };

@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Header from './Header';
-import SocketDebugger from '../components/SocketDebugger';
+import AlertsSidebar from '../components/AlertsSidebar';
 
 import { useRealTimeData } from '../hooks/useRealTimeData';
 import { useVisualizationMode } from '../hooks/useVisualizationMode';
@@ -60,13 +61,14 @@ const LoadingText = styled.div`
 const Layout = () => {
   const { floorData, predictions, alerts, isConnected, isLoading } = useRealTimeData();
   const { currentMode } = useVisualizationMode();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Show loading screen while fetching initial data
   if (isLoading) {
     return (
       <LoadingOverlay>
         <LoadingSpinner />
-        <LoadingText>🏢 Cargando SmartFloors AI...</LoadingText>
+        <LoadingText>Cargando SmartFloors AI...</LoadingText>
       </LoadingOverlay>
     );
   }
@@ -76,10 +78,17 @@ const Layout = () => {
       <Header
         isConnected={isConnected}
         alerts={alerts}
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        sidebarOpen={isSidebarOpen}
       />
       <Main>
         <Outlet context={{ floorData, predictions, alerts, isLoading, currentMode }} />
       </Main>
+      <AlertsSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        alerts={alerts}
+      />
       {/* <SocketDebugger /> */}
     </LayoutContainer>
   );

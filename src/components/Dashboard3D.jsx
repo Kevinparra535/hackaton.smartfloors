@@ -12,8 +12,8 @@ import { Environment } from '@react-three/drei';
 const Dashboard3D = ({ floorData, onFloorHover, onFloorClick }) => {
   return (
     <Canvas shadows gl={{ antialias: true, alpha: false }} style={{}}>
-      <BuildingScene 
-        floorData={floorData} 
+      <BuildingScene
+        floorData={floorData}
         onFloorHover={onFloorHover}
         onFloorClick={onFloorClick}
       />
