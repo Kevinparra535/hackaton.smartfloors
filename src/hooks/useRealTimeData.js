@@ -67,6 +67,8 @@ export const useRealTimeData = () => {
               message: anomaly.message,
               value: anomaly.value,
               recommendation: anomaly.recommendation,
+              isPredictive: anomaly.isPredictive || false,
+              minutesAhead: anomaly.minutesAhead,
               timestamp: anomaly.timestamp || alertGroup.timestamp
             };
 
@@ -137,6 +139,8 @@ export const useRealTimeData = () => {
                   message: anomaly.message,
                   value: anomaly.value,
                   recommendation: anomaly.recommendation,
+                  isPredictive: anomaly.isPredictive || false,
+                  minutesAhead: anomaly.minutesAhead,
                   timestamp: anomaly.timestamp || alertGroup.timestamp
                 });
               });

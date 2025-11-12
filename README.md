@@ -88,9 +88,9 @@ GET  /api/v1/alerts
 
 ### Eventos WebSocket
 
-- `floorData` - Actualización de métricas
-- `new-alerts` - Nuevas alertas
-- `predictions` - Predicciones ML
+- `floor-data` - Actualización de métricas de pisos
+- `new-alerts` - Nuevas alertas del sistema
+- `predictions` - Predicciones ML actualizadas
 
 ### CORS
 

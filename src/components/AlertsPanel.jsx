@@ -47,6 +47,7 @@ export default function AlertsPanel({ alerts }) {
               >
                 <AlertHeader>
                   <AlertFloor>
+                    {alert.isPredictive && '🔮 '}
                     {alert.floorName || alert.name || `Piso ${alert.floorId || alert.floor}`}
                   </AlertFloor>
                   <AlertTime>{formatTime(alert.timestamp)}</AlertTime>
@@ -54,7 +55,13 @@ export default function AlertsPanel({ alerts }) {
                 <AlertMessage>
                   {alert.message ||
                     `${alert.type || 'Alerta'}: ${alert.value || 'Anomalía detectada'}`}
+                  {alert.minutesAhead && ` (en ${alert.minutesAhead} min)`}
                 </AlertMessage>
+                {alert.recommendation && severityValue === 'danger' && (
+                  <AlertMessage style={{ fontSize: '0.75rem', opacity: 0.8, marginTop: '0.3rem' }}>
+                    💡 {alert.recommendation}
+                  </AlertMessage>
+                )}
               </AlertItem>
             );
           })

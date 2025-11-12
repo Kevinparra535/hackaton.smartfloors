@@ -15,8 +15,8 @@ Renderiza Dashboard con datos reales
 WebSocket: Conecta a http://localhost:3000
     ↓
 Escucha eventos en tiempo real:
-  - floorData (actualización de métricas)
-  - new-alerts (nuevas alertas) ⚠️ Note: event name is 'new-alerts', not 'alert'
+  - floor-data (actualización de métricas de pisos)
+  - new-alerts (nuevas alertas del sistema)
   - predictions (nuevas predicciones ML)
 ```
 
@@ -47,7 +47,7 @@ Respuesta del backend:
 }
 ```
 
-### WebSocket: Evento `floorData`
+### WebSocket: Evento `floor-data`
 
 Estructura en tiempo real (igual formato):
 ```json
@@ -190,7 +190,7 @@ setFloorData(updatedFloors);
 }
 ```
 
-### WebSocket: Evento `alert`
+### WebSocket: Evento `new-alerts`
 
 **Estructura en Tiempo Real:**
 
@@ -262,13 +262,16 @@ const SOCKET_URL = 'http://localhost:3000';
 const socket = io(SOCKET_URL);
 
 // Suscribirse a eventos
-socket.on('floorData', (data) => {
+socket.on('floor-data', (data) => {
   // Procesar { floors: [...], timestamp: "..." }
 });
 
-socket.on('new-alerts', (alert) => {
-  // ⚠️ Important: Event name is 'new-alerts', not 'alert'
+socket.on('new-alerts', (alertData) => {
   // Procesar alerta individual o batch con {alerts: [...]}
+});
+
+socket.on('predictions', (data) => {
+  // Procesar predicciones ML
 });
 ```
 
@@ -276,19 +279,33 @@ socket.on('new-alerts', (alert) => {
 
 ```javascript
 // Ejemplo de emisión desde el backend
-io.emit('floorData', {
+io.emit('floor-data', {
   floors: [
     /* array de 5 pisos */
   ],
   timestamp: new Date().toISOString()
 });
 
-// Emitir alerta individual
-io.emit('alert', {
-  floorId: 3,
-  message: 'Temperatura alta',
-  severity: 'warning',
-  timestamp: new Date().toISOString()
+// Emitir alertas
+io.emit('new-alerts', {
+  alerts: [
+    {
+      floorId: 3,
+      floorName: 'Piso 3',
+      anomalies: [
+        {
+          type: 'temperature',
+          severity: 'warning',
+          message: 'Temperatura alta',
+          value: 25.2,
+          recommendation: 'Ajustar climatización',
+          timestamp: new Date().toISOString()
+        }
+      ],
+      timestamp: new Date().toISOString(),
+      severity: 'warning'
+    }
+  ]
 });
 ```
 
@@ -327,7 +344,7 @@ const { getSocket } = await import('/src/api/socket.js');
 const socket = getSocket();
 
 // Emitir datos de prueba
-socket.emit('floorData', {
+socket.emit('floor-data', {
   floors: [
     {
       floorId: 1,
@@ -452,10 +469,10 @@ Muestra predicciones del piso seleccionado con:
 
 ## 🔄 Flujo Completo
 
-```
+```mermaid
 Backend → Socket.IO → Frontend
    ↓
-Emite 'floorData'
+Emite 'floor-data'
    ↓
 useRealTimeData hook
    ↓

@@ -90,8 +90,8 @@ src/
 ### WebSocket Integration
 - **Socket.IO Client** - connects to `http://localhost:3000`
 - **Event listeners**:
-  - `floorData` - receives floor updates with array of 5 floors
-  - `alert` - receives alert notifications with anomalies array
+  - `floor-data` - receives floor updates with array of 5 floors
+  - `new-alerts` - receives alert notifications with anomalies array
   - `predictions` - receives ML predictions for all floors
 - **Auto-reconnection** - 5 attempts with 1s delay
 - **Connection singleton** - `getSocket()` ensures single instance
@@ -160,7 +160,7 @@ src/
 - Create subscription functions (e.g., `subscribeToNewEvent`)
 - Handle events in `useRealTimeData` hook
 - Update component state with callbacks
-- **Current events**: `floorData`, `alert`, `predictions`
+- **Current events**: `floor-data`, `new-alerts`, `predictions`
 
 ### REST API Calls
 - Add new API functions in `src/api/rest.js`
