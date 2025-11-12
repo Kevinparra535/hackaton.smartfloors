@@ -40,7 +40,7 @@ export const Title = styled.h2`
 export const AlertItem = styled(motion.div)`
   background: ${({ $severity, $isPredictive }) => {
     const severity = $severity?.toLowerCase();
-    
+
     // Predictive alerts get a purple/blue tint
     if ($isPredictive) {
       if (severity === 'danger' || severity === 'critical') {
@@ -51,7 +51,7 @@ export const AlertItem = styled(motion.div)`
       }
       return 'rgba(0, 180, 216, 0.15)'; // Cyan for predictive normal
     }
-    
+
     // Current alerts - original colors
     if (severity === 'danger' || severity === 'critical') {
       return 'rgba(255, 77, 79, 0.15)';
@@ -64,7 +64,7 @@ export const AlertItem = styled(motion.div)`
   border-left: 3px solid
     ${({ $severity, $isPredictive }) => {
       const severity = $severity?.toLowerCase();
-      
+
       // Predictive alerts get a purple/blue border
       if ($isPredictive) {
         if (severity === 'danger' || severity === 'critical') {
@@ -75,7 +75,7 @@ export const AlertItem = styled(motion.div)`
         }
         return '#00b4d8'; // Cyan for predictive normal
       }
-      
+
       // Current alerts - original colors
       if (severity === 'danger' || severity === 'critical') {
         return '#ff4d4f'; // Red

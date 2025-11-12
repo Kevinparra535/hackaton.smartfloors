@@ -25,21 +25,21 @@ const FloatingParticles = ({ count = 100 }) => {
   useFrame((state) => {
     if (particlesRef.current) {
       const positions = particlesRef.current.geometry.attributes.position.array;
-      
+
       for (let i = 0; i < positions.length; i += 3) {
         // Slow vertical drift
         positions[i + 1] += Math.sin(state.clock.elapsedTime * 0.3 + i) * 0.002;
-        
+
         // Reset if particle drifts too high
         if (positions[i + 1] > 15) {
           positions[i + 1] = -5;
         }
-        
+
         // Subtle horizontal drift
         positions[i] += Math.sin(state.clock.elapsedTime * 0.2 + i) * 0.001;
         positions[i + 2] += Math.cos(state.clock.elapsedTime * 0.2 + i) * 0.001;
       }
-      
+
       particlesRef.current.geometry.attributes.position.needsUpdate = true;
     }
   });
@@ -48,7 +48,7 @@ const FloatingParticles = ({ count = 100 }) => {
     <points ref={particlesRef}>
       <bufferGeometry>
         <bufferAttribute
-          attach="attributes-position"
+          attach='attributes-position'
           count={particles.length / 3}
           array={particles}
           itemSize={3}
@@ -56,7 +56,7 @@ const FloatingParticles = ({ count = 100 }) => {
       </bufferGeometry>
       <pointsMaterial
         size={0.05}
-        color="#646cff"
+        color='#646cff'
         transparent
         opacity={0.6}
         sizeAttenuation

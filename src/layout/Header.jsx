@@ -2,6 +2,8 @@ import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { FiBell } from 'react-icons/fi';
 import { ConnectionStatus, HeaderStyled, Title } from '../styles/Header.styled';
+import VisualizationSelector from '../components/VisualizationSelector';
+import { useVisualizationMode } from '../hooks/useVisualizationMode';
 
 const Nav = styled.nav`
   display: flex;
@@ -38,11 +40,8 @@ const TabLink = styled(NavLink)`
 const AlertsButton = styled.button`
   position: relative;
   padding: 0.6rem 1.2rem;
-  background: ${(props) =>
-    props.$active ? '#646cff' : 'rgba(26, 26, 26, 0.5)'};
-  border: 1px solid
-    ${(props) =>
-      props.$active ? '#646cff' : 'rgba(100, 108, 255, 0.2)'};
+  background: ${(props) => (props.$active ? '#646cff' : 'rgba(26, 26, 26, 0.5)')};
+  border: 1px solid ${(props) => (props.$active ? '#646cff' : 'rgba(100, 108, 255, 0.2)')};
   border-radius: 8px;
   color: #ffffff;
   font-weight: 500;
@@ -54,8 +53,7 @@ const AlertsButton = styled.button`
   font-size: 1rem;
 
   &:hover {
-    background: ${(props) =>
-      props.$active ? '#5a5fcf' : 'rgba(100, 108, 255, 0.1)'};
+    background: ${(props) => (props.$active ? '#5a5fcf' : 'rgba(100, 108, 255, 0.1)')};
     border-color: rgba(100, 108, 255, 0.5);
     transform: translateY(-2px);
   }
@@ -71,8 +69,7 @@ const AlertBadge = styled.span`
   font-weight: 700;
   min-width: 20px;
   text-align: center;
-  box-shadow: ${(props) =>
-    props.$count > 0 ? '0 2px 8px rgba(255, 77, 79, 0.4)' : 'none'};
+  box-shadow: ${(props) => (props.$count > 0 ? '0 2px 8px rgba(255, 77, 79, 0.4)' : 'none')};
   animation: ${(props) => (props.$count > 0 ? 'pulse 2s infinite' : 'none')};
 
   @keyframes pulse {
@@ -87,6 +84,8 @@ const AlertBadge = styled.span`
 `;
 
 const Header = ({ isConnected, alerts = [], onToggleSidebar, sidebarOpen }) => {
+  const { currentMode, setVisualizationMode } = useVisualizationMode();
+
   return (
     <HeaderStyled>
       <Title>SmartFloors AI</Title>
@@ -97,6 +96,8 @@ const Header = ({ isConnected, alerts = [], onToggleSidebar, sidebarOpen }) => {
         </TabLink>
         <TabLink to='/analytics'>📊 Análisis</TabLink>
       </Nav>
+
+      <VisualizationSelector currentMode={currentMode} onModeChange={setVisualizationMode} />
 
       <AlertsButton onClick={onToggleSidebar} $active={sidebarOpen}>
         <FiBell />

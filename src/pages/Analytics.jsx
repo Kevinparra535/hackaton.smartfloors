@@ -86,20 +86,20 @@ const MetricLabel = styled.div`
 `;
 
 const Analytics = () => {
-  // const { floorData } = useOutletContext();
+  const { floorData } = useOutletContext();
 
-  // // Calcular métricas agregadas
-  // const totalFloors = floorData.length;
-  // const avgOccupancy = floorData.reduce((sum, floor) => sum + floor.occupancy, 0) / totalFloors;
-  // const avgTemperature =
-  //   floorData.reduce((sum, floor) => sum + floor.temperature, 0) / totalFloors;
-  // const totalPower = floorData.reduce((sum, floor) => sum + floor.powerConsumption, 0);
+  // Calcular métricas agregadas
+  const totalFloors = floorData.length;
+  const avgOccupancy = floorData.reduce((sum, floor) => sum + floor.occupancy, 0) / totalFloors;
+  const avgTemperature =
+    floorData.reduce((sum, floor) => sum + floor.temperature, 0) / totalFloors;
+  const totalPower = floorData.reduce((sum, floor) => sum + floor.powerConsumption, 0);
 
   return (
     <AnalyticsContainer>
       <Title>📊 Análisis y Estadísticas</Title>
 
-      {/* <Grid>
+      <Grid>
         <Card>
           <CardTitle>Total de Pisos</CardTitle>
           <Metric>{totalFloors}</Metric>
@@ -152,7 +152,7 @@ const Analytics = () => {
             </FloorMetric>
           </FloorCard>
         ))}
-      </FloorList> */}
+      </FloorList>
     </AnalyticsContainer>
   );
 };

@@ -1,4 +1,4 @@
-import { SelectorContainer, SelectorLabel, Select } from '../styles/VisualizationControls.styled';
+import { SelectorContainer, Select } from '../styles/VisualizationControls.styled';
 
 const MODES = [
   { value: 'heat_layer', label: 'Capas de Color' },
@@ -24,6 +24,7 @@ const VisualizationSelector = ({ currentMode, onModeChange }) => {
         value={currentMode}
         onChange={handleChange}
         title='Cambiar modo de visualización'
+        aria-label='Selector de modo de visualización'
       >
         {MODES.map((mode) => (
           <option key={mode.value} value={mode.value}>

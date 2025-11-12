@@ -10,11 +10,7 @@ const Home = () => {
   return (
     <MainContent>
       <CanvasWrapper>
-        <Dashboard3D
-          floorData={floorData}
-          predictions={predictions}
-          alerts={alerts}
-        />
+        <Dashboard3D floorData={floorData} predictions={predictions} alerts={alerts} />
       </CanvasWrapper>
 
       {/* Color Legend - Leyenda de estados */}

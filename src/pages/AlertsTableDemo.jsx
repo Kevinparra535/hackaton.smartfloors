@@ -53,9 +53,7 @@ const AlertsTableDemo = () => {
           </ErrorState>
         )}
 
-        {!isLoading && !error && (
-          <AlertsTable alerts={alerts} />
-        )}
+        {!isLoading && !error && <AlertsTable alerts={alerts} />}
       </Content>
     </Container>
   );

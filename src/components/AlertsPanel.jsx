@@ -35,7 +35,7 @@ export default function AlertsPanel({ alerts }) {
           alerts.map((alert) => {
             // Normalize severity value to lowercase for consistent comparison
             const severityValue = (alert.severity || alert.status || 'normal').toLowerCase();
-            
+
             // Debug: log severity values
             console.log('🎨 [AlertsPanel] Alert severity:', {
               original: alert.severity,
@@ -66,11 +66,14 @@ export default function AlertsPanel({ alerts }) {
                     `${alert.type || 'Alerta'}: ${alert.value || 'Anomalía detectada'}`}
                   {alert.minutesAhead && ` (en ${alert.minutesAhead} min)`}
                 </AlertMessage>
-                {alert.recommendation && (severityValue === 'danger' || severityValue === 'critical') && (
-                  <AlertMessage style={{ fontSize: '0.75rem', opacity: 0.8, marginTop: '0.3rem' }}>
-                    💡 {alert.recommendation}
-                  </AlertMessage>
-                )}
+                {alert.recommendation &&
+                  (severityValue === 'danger' || severityValue === 'critical') && (
+                    <AlertMessage
+                      style={{ fontSize: '0.75rem', opacity: 0.8, marginTop: '0.3rem' }}
+                    >
+                      💡 {alert.recommendation}
+                    </AlertMessage>
+                  )}
               </AlertItem>
             );
           })

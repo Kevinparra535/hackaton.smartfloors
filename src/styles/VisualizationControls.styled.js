@@ -8,7 +8,6 @@ export const SelectorContainer = styled.div`
   align-items: center;
   gap: 0.75rem;
   margin-left: auto;
-  margin-right: 1rem;
 `;
 
 export const SelectorLabel = styled.label`
@@ -30,7 +29,7 @@ export const Select = styled.select`
   border: 1px solid rgba(100, 108, 255, 0.3);
   border-radius: 8px;
   color: #ffffff;
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -38,11 +37,13 @@ export const Select = styled.select`
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.5rem center;
+  background-position: right 0.75rem center;
+  min-width: 180px;
 
   &:hover {
     border-color: rgba(100, 108, 255, 0.6);
     background-color: rgba(100, 108, 255, 0.1);
+    transform: translateY(-2px);
   }
 
   &:focus {
@@ -54,7 +55,8 @@ export const Select = styled.select`
   option {
     background: #1a1a1a;
     color: #ffffff;
-    padding: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.9rem;
   }
 `;
 

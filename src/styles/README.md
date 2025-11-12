@@ -43,7 +43,7 @@ import styled from 'styled-components';
 const Button = styled.button`
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.white};
-  
+
   &:hover {
     background: ${({ theme }) => theme.colors.primaryHover};
   }
@@ -71,11 +71,11 @@ import { media } from '../styles';
 
 const ResponsiveBox = styled.div`
   padding: 1rem;
-  
+
   ${media.tablet} {
     padding: 2rem;
   }
-  
+
   ${media['desktop-s']} {
     padding: 3rem;
   }
@@ -85,15 +85,17 @@ const ResponsiveBox = styled.div`
 ### Using Advanced Helpers
 
 #### fontSize Helper
+
 ```jsx
 import { fontSize } from '../styles';
 
 const Heading = styled.h1`
-  ${fontSize(24)}  // Auto-calculates rem and line-height
+  ${fontSize(24)}// Auto-calculates rem and line-height
 `;
 ```
 
 #### getOpacity Helper
+
 ```jsx
 import { colors, getOpacity } from '../styles';
 
@@ -103,27 +105,30 @@ const Panel = styled.div`
 ```
 
 #### size Helper
+
 ```jsx
 import { size } from '../styles';
 
 const Avatar = styled.img`
-  ${size(48)}  // width: 48px, height: 48px
+  ${size(48)}// width: 48px, height: 48px
 `;
 ```
 
 #### Contrast Color (WCAG)
+
 ```jsx
 import { getContrastColor } from '../styles';
 
 const Button = styled.button`
-  background: ${props => props.bg};
-  color: ${props => getContrastColor(props.bg)};
+  background: ${(props) => props.bg};
+  color: ${(props) => getContrastColor(props.bg)};
 `;
 ```
 
 ## Design Tokens (SCSS Parity)
 
 ### Spacing Scale
+
 - `space`: 1rem (16px)
 - `space_half`: 0.5rem (8px)
 - `space_x2`: 2rem (32px)
@@ -134,6 +139,7 @@ const Button = styled.button`
 - `space_x7`: 7rem (112px)
 
 ### Breakpoints (SCSS Parity)
+
 - `tablet`: 768px
 - `desktop-s`: 992px
 - `desktop-m`: 1200px
@@ -142,6 +148,7 @@ const Button = styled.button`
 - `desktop-xl`: 1780px
 
 ### Media Queries
+
 - `tablet` - min-width: 768px
 - `desktop-s` - min-width: 992px
 - `desktop-m` - min-width: 1200px
@@ -159,17 +166,20 @@ const Button = styled.button`
 ### Color Palette
 
 #### Primary Colors
+
 - `primary`: #646cff (brand blue)
 - `primaryHover`: #535bf2
 - `primaryLight`: rgba(100, 108, 255, 0.1)
 
 #### Status Colors
+
 - `success`: #00ff88 (green)
 - `warning`: #ffd966 (yellow)
 - `danger`: #ff4d4f (red)
 - `info`: #646cff (blue)
 
 #### Heat Layer States
+
 - `normal`: #00ff88
 - `warning`: #ffd966
 - `critical`: #ff4d4f
@@ -178,6 +188,7 @@ const Button = styled.button`
 - `severe`: #ff3333
 
 #### Dark Theme
+
 - Background: #0a0a0a
 - Panel: rgba(26, 26, 26, 0.95)
 - Elevated: rgba(40, 40, 40, 0.95)
@@ -186,11 +197,13 @@ const Button = styled.button`
 ### Typography
 
 #### Font Families
+
 - `body`: 'Poppins', sans-serif
 - `heading`: 'Montserrat', sans-serif
 - `mono`: 'Fira Code', monospace
 
 #### Font Sizes
+
 - `xs`: 0.75rem (12px)
 - `sm`: 0.875rem (14px)
 - `base`: 1rem (16px)
@@ -202,6 +215,7 @@ const Button = styled.button`
 - `5xl`: 3rem (48px)
 
 #### Font Weights
+
 - `light`: 300
 - `normal`: 400
 - `medium`: 500
@@ -211,6 +225,7 @@ const Button = styled.button`
 ## Available Mixins
 
 ### Layout
+
 - `flexCenter` - Center items with flexbox
 - `flexBetween` - Space between with flexbox
 - `flexColumn` - Flex column direction
@@ -218,6 +233,7 @@ const Button = styled.button`
 - `absoluteFill` - Fill parent absolutely
 
 ### Typography
+
 - `heading1`, `heading2`, `heading3` - Heading styles
 - `bodyText` - Body text style
 - `smallText` - Small text style
@@ -225,6 +241,7 @@ const Button = styled.button`
 - `lineClamp(lines)` - Multi-line truncate
 
 ### Effects
+
 - `glassMorphism` - Glass panel effect
 - `card` - Card style with shadow
 - `cardHover` - Card with hover effect
@@ -233,11 +250,13 @@ const Button = styled.button`
 - `slideUp` - Slide up animation
 
 ### Interactive
+
 - `hoverScale(scale)` - Scale on hover
 - `focusRing` - Accessible focus outline
 - `statusIndicator(status)` - Status dot
 
 ### Utilities
+
 - `customScrollbar` - Styled scrollbar
 - `hideScrollbar` - Hidden scrollbar
 - `aspectRatio(w, h)` - Aspect ratio helper
@@ -281,16 +300,17 @@ const StatusCard = styled.div`
   ${flexCenter}
   gap: ${spacing.md};
   min-height: 200px;
-  
-  background: ${({ theme, $status }) => 
-    $status === 'danger' ? theme.heatStates.critical :
-    $status === 'warning' ? theme.heatStates.warning :
-    theme.heatStates.normal
-  };
-  
+
+  background: ${({ theme, $status }) =>
+    $status === 'danger'
+      ? theme.heatStates.critical
+      : $status === 'warning'
+        ? theme.heatStates.warning
+        : theme.heatStates.normal};
+
   border-radius: ${radii.xl};
   transition: transform 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-4px);
   }
@@ -315,11 +335,11 @@ const Grid = styled.div`
   display: grid;
   gap: ${spacing.md};
   grid-template-columns: 1fr;
-  
+
   ${media.tablet} {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   ${media.desktop} {
     grid-template-columns: repeat(3, 1fr);
   }

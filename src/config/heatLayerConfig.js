@@ -20,28 +20,28 @@ export const HEAT_LAYER_STATES = {
  */
 export const HEAT_LAYER_COLORS = {
   [HEAT_LAYER_STATES.OPTIMAL]: {
-    primary: '#00b4d8',      // Azul - Óptimo
+    primary: '#00b4d8', // Azul - Óptimo
     secondary: '#0096c7',
     gradient: ['#00b4d8', '#0077b6'],
     emissive: '#00b4d8',
     name: 'Óptimo'
   },
   [HEAT_LAYER_STATES.WARNING]: {
-    primary: '#ffd966',      // Amarillo - Alerta media
+    primary: '#ffd966', // Amarillo - Alerta media
     secondary: '#ffb703',
     gradient: ['#ffd966', '#ffb703'],
     emissive: '#ffd966',
     name: 'Alerta Media'
   },
   [HEAT_LAYER_STATES.CRITICAL]: {
-    primary: '#ff4d4f',      // Rojo - Alerta crítica
+    primary: '#ff4d4f', // Rojo - Alerta crítica
     secondary: '#dc2f02',
     gradient: ['#ff4d4f', '#dc2f02'],
     emissive: '#ff4d4f',
     name: 'Crítico'
   },
   [HEAT_LAYER_STATES.COMBINED_RISK]: {
-    primary: '#9d4edd',      // Morado - Riesgo combinado
+    primary: '#9d4edd', // Morado - Riesgo combinado
     secondary: '#7209b7',
     gradient: ['#9d4edd', '#7209b7'],
     emissive: '#9d4edd',
@@ -52,7 +52,7 @@ export const HEAT_LAYER_COLORS = {
 /**
  * Manual Heat Layer Configuration
  * Set the heat state for each floor manually
- * 
+ *
  * CAMBIAR ESTOS VALORES PARA PROBAR DIFERENTES ESTADOS VISUALES:
  * - 'optimal': Azul
  * - 'warning': Amarillo
@@ -60,11 +60,11 @@ export const HEAT_LAYER_COLORS = {
  * - 'combined_risk': Morado
  */
 export const MANUAL_HEAT_CONFIG = {
-  1: HEAT_LAYER_STATES.OPTIMAL,        // Piso 1: Azul
-  2: HEAT_LAYER_STATES.WARNING,        // Piso 2: Amarillo
-  3: HEAT_LAYER_STATES.CRITICAL,       // Piso 3: Rojo
-  4: HEAT_LAYER_STATES.COMBINED_RISK,  // Piso 4: Morado
-  5: HEAT_LAYER_STATES.OPTIMAL         // Piso 5: Azul
+  1: HEAT_LAYER_STATES.OPTIMAL, // Piso 1: Azul
+  2: HEAT_LAYER_STATES.WARNING, // Piso 2: Amarillo
+  3: HEAT_LAYER_STATES.CRITICAL, // Piso 3: Rojo
+  4: HEAT_LAYER_STATES.COMBINED_RISK, // Piso 4: Morado
+  5: HEAT_LAYER_STATES.OPTIMAL // Piso 5: Azul
 };
 
 /**
@@ -73,16 +73,16 @@ export const MANUAL_HEAT_CONFIG = {
  */
 export const HEAT_LAYER_SETTINGS = {
   // Transparency
-  mainOpacity: 0.7,           // Opacidad del bloque principal
-  glowOpacity: 0.3,           // Opacidad del resplandor exterior
-  
+  mainOpacity: 0.7, // Opacidad del bloque principal
+  glowOpacity: 0.3, // Opacidad del resplandor exterior
+
   // Gradient
-  gradientIntensity: 0.8,     // Intensidad del gradiente
-  
+  gradientIntensity: 0.8, // Intensidad del gradiente
+
   // Animation
-  pulseSpeed: 1.5,            // Velocidad de pulsación (crítico/combinado)
-  pulseIntensity: 0.3,        // Intensidad de pulsación
-  
+  pulseSpeed: 1.5, // Velocidad de pulsación (crítico/combinado)
+  pulseIntensity: 0.3, // Intensidad de pulsación
+
   // Glow
   emissiveIntensity: {
     optimal: 0.3,
@@ -90,7 +90,7 @@ export const HEAT_LAYER_SETTINGS = {
     critical: 0.8,
     combined_risk: 0.9
   },
-  
+
   // Light
   pointLightIntensity: {
     optimal: 1,
@@ -99,9 +99,9 @@ export const HEAT_LAYER_SETTINGS = {
     combined_risk: 3
   },
   pointLightDistance: 6,
-  
+
   // Wireframe glow
-  wireframeScale: 1.08,       // Escala del wireframe exterior
+  wireframeScale: 1.08, // Escala del wireframe exterior
   wireframeOpacity: 0.2
 };
 

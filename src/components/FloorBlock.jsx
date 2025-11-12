@@ -97,12 +97,7 @@ export default function FloorBlock({ data, position, onClick }) {
   return (
     <group position={[0, position, 0]}>
       {/* Main floor block with heat layer material */}
-      <mesh
-        ref={meshRef}
-        onPointerDown={handleClick}
-        castShadow
-        receiveShadow
-      >
+      <mesh ref={meshRef} onPointerDown={handleClick} castShadow receiveShadow>
         <boxGeometry args={[3, 1.5, 3]} />
         <meshStandardMaterial
           ref={materialRef}
@@ -158,7 +153,7 @@ export default function FloorBlock({ data, position, onClick }) {
       {showHeatLayer && (
         <Text
           position={[0, -0.3, 1.6]}
-          fontSize={0.10}
+          fontSize={0.1}
           color='#ffffff'
           anchorX='center'
           anchorY='middle'

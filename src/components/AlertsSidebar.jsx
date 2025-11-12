@@ -515,7 +515,7 @@ export default function AlertsSidebar({ isOpen, onClose, alerts: initialAlerts =
   const handleExportCSV = async () => {
     try {
       console.log('🔄 Iniciando exportación CSV con filtros:', filters);
-      
+
       // Build backend filters
       const backendFilters = {};
       if (filters.severity !== 'all') {
@@ -542,19 +542,19 @@ export default function AlertsSidebar({ isOpen, onClose, alerts: initialAlerts =
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      
+
       // Generate filename with current date
       const date = new Date().toISOString().split('T')[0];
       link.download = `alertas-smartfloors-${date}.csv`;
-      
+
       // Trigger download
       document.body.appendChild(link);
       link.click();
-      
+
       // Cleanup
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
+
       console.log('✅ Exportación completada exitosamente');
     } catch (error) {
       console.error('❌ Error completo en exportación:', error);
@@ -621,7 +621,7 @@ export default function AlertsSidebar({ isOpen, onClose, alerts: initialAlerts =
                   <FiFilter /> Filtros
                 </FiltersTitle>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <ExportButton onClick={handleExportCSV} title="Exportar alertas a CSV">
+                  <ExportButton onClick={handleExportCSV} title='Exportar alertas a CSV'>
                     <FiDownload /> Exportar CSV
                   </ExportButton>
                   <ClearFiltersButton onClick={clearAllFilters} disabled={!hasActiveFilters}>

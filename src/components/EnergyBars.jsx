@@ -17,21 +17,21 @@ export default function EnergyBars({ config, settings }) {
     const positions = [];
     const count = config.barCount;
     const radius = 1.0;
-    
+
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       positions.push({ x, z, delay: i * 0.2 });
     }
-    
+
     return positions;
   }, [config.barCount]);
 
   // Generate electric arc points
   const arcPoints = useMemo(() => {
     if (!config.electricArcs) return [];
-    
+
     const arcs = [];
     for (let i = 0; i < settings.arcCount; i++) {
       const angle = (i / settings.arcCount) * Math.PI * 2;
@@ -48,47 +48,50 @@ export default function EnergyBars({ config, settings }) {
     if (barsGroupRef.current) {
       barsGroupRef.current.children.forEach((bar, index) => {
         const delay = barPositions[index].delay;
-        
+
         switch (config.effect) {
           case 'gentle_pulse':
             // Suave pulsación para estado frío/bajo consumo
             bar.scale.y = 0.8 + Math.sin(time * config.animationSpeed + delay) * 0.2;
             bar.material.opacity = config.opacity * (0.8 + Math.sin(time + delay) * 0.2);
             break;
-            
+
           case 'electric_pulse':
             // Pulsos eléctricos rápidos
             bar.scale.y = 0.6 + Math.sin(time * config.animationSpeed * 2 + delay) * 0.4;
-            bar.material.emissiveIntensity = config.barIntensity * (0.7 + Math.sin(time * 3 + delay) * 0.3);
+            bar.material.emissiveIntensity =
+              config.barIntensity * (0.7 + Math.sin(time * 3 + delay) * 0.3);
             break;
-            
+
           case 'steady_flow':
             // Flujo constante para estado óptimo
             bar.scale.y = 0.9 + Math.sin(time * config.animationSpeed + delay) * 0.1;
             bar.position.y = Math.sin(time * 0.5 + delay) * 0.05;
             break;
-            
+
           case 'heat_shimmer':
             // Ondulación de calor suave
             bar.position.x += Math.sin(time * 2 + delay) * 0.003;
             bar.position.z += Math.cos(time * 2 + delay) * 0.003;
             bar.scale.y = 0.85 + Math.sin(time * config.animationSpeed + delay) * 0.15;
             break;
-            
+
           case 'heat_wave':
             // Distorsión de calor intensa
             bar.position.x += Math.sin(time * 3 + delay) * 0.01;
             bar.position.z += Math.cos(time * 3 + delay) * 0.01;
             bar.scale.y = 0.7 + Math.sin(time * config.animationSpeed + delay) * 0.3;
-            bar.material.emissiveIntensity = config.barIntensity * (0.8 + Math.sin(time * 2 + delay) * 0.2);
+            bar.material.emissiveIntensity =
+              config.barIntensity * (0.8 + Math.sin(time * 2 + delay) * 0.2);
             break;
-            
+
           case 'critical_overload':
             // Estado crítico con máxima distorsión
             bar.position.x += Math.sin(time * 5 + delay) * 0.02;
             bar.position.z += Math.cos(time * 5 + delay) * 0.02;
             bar.scale.y = 0.5 + Math.sin(time * config.animationSpeed + delay) * 0.5;
-            bar.material.emissiveIntensity = config.barIntensity * (0.9 + Math.sin(time * 4 + delay) * 0.1);
+            bar.material.emissiveIntensity =
+              config.barIntensity * (0.9 + Math.sin(time * 4 + delay) * 0.1);
             bar.material.opacity = config.opacity * (0.9 + Math.sin(time * 3 + delay) * 0.1);
             break;
         }
@@ -98,7 +101,7 @@ export default function EnergyBars({ config, settings }) {
     // Animate electric arcs
     if (arcsGroupRef.current && config.electricArcs) {
       arcsGroupRef.current.rotation.y = time * settings.arcSpeed * 0.3;
-      
+
       arcsGroupRef.current.children.forEach((arc, index) => {
         const pulse = Math.sin(time * settings.arcSpeed + arcPoints[index].phase);
         arc.material.opacity = config.opacity * 0.6 * (0.5 + pulse * 0.5);
@@ -131,14 +134,8 @@ export default function EnergyBars({ config, settings }) {
         <group ref={arcsGroupRef}>
           {arcPoints.map((arc, index) => (
             <mesh key={`arc-${index}`} rotation={[0, arc.angle, 0]}>
-              <torusGeometry 
-                args={[
-                  settings.arcRadius, 
-                  settings.arcThickness, 
-                  8, 
-                  32,
-                  Math.PI * 0.5
-                ]} 
+              <torusGeometry
+                args={[settings.arcRadius, settings.arcThickness, 8, 32, Math.PI * 0.5]}
               />
               <meshStandardMaterial
                 color={config.secondaryColor}

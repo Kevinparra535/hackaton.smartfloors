@@ -19,11 +19,7 @@ const GradientBackground = () => {
   return (
     <mesh ref={sphereRef} scale={[-1, 1, 1]}>
       <sphereGeometry args={[50, 32, 32]} />
-      <meshBasicMaterial
-        side={THREE.BackSide}
-        color="#0a0a0a"
-        fog={false}
-      />
+      <meshBasicMaterial side={THREE.BackSide} color='#0a0a0a' fog={false} />
     </mesh>
   );
 };

@@ -94,7 +94,7 @@ export const card = css`
 export const cardHover = css`
   ${card}
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -104,7 +104,7 @@ export const cardHover = css`
 // Interactive states
 export const hoverScale = (scale = 1.05) => css`
   transition: transform 0.15s ease;
-  
+
   &:hover {
     transform: scale(${scale});
   }
@@ -121,16 +121,20 @@ export const focusRing = css`
 // Transitions
 export const fadeIn = css`
   animation: fadeIn 0.25s ease-out;
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
 export const slideUp = css`
   animation: slideUp 0.25s ease-out;
-  
+
   @keyframes slideUp {
     from {
       opacity: 0;
@@ -145,7 +149,11 @@ export const slideUp = css`
 
 // Gradient backgrounds
 export const gradientPrimary = css`
-  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.primaryHover} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary} 0%,
+    ${theme.colors.primaryHover} 100%
+  );
 `;
 
 export const gradientDanger = css`
@@ -187,7 +195,7 @@ export const customScrollbar = css`
   &::-webkit-scrollbar-thumb {
     background: ${theme.border.medium};
     border-radius: 9999px;
-    
+
     &:hover {
       background: ${theme.border.strong};
     }
@@ -201,7 +209,7 @@ export const customScrollbar = css`
 export const hideScrollbar = css`
   -ms-overflow-style: none;
   scrollbar-width: none;
-  
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -210,7 +218,7 @@ export const hideScrollbar = css`
 // Aspect ratio (legacy support)
 export const aspectRatio = (width, height) => css`
   aspect-ratio: ${width} / ${height};
-  
+
   @supports not (aspect-ratio: 1 / 1) {
     &::before {
       content: '';
@@ -247,7 +255,7 @@ export const statusIndicator = (status) => {
     danger: theme.colors.danger,
     info: theme.colors.info
   };
-  
+
   return css`
     &::before {
       content: '';
@@ -271,10 +279,14 @@ export const shimmer = css`
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  
+
   @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 `;
 

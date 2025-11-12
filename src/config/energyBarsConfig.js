@@ -9,12 +9,12 @@ import * as THREE from 'three';
  * Energy States basados en temperatura y consumo
  */
 export const ENERGY_STATES = {
-  COLD_LOW: 'cold_low',           // Frío + bajo consumo
-  COLD_HIGH: 'cold_high',         // Frío + alto consumo
-  OPTIMAL: 'optimal',             // Temperatura normal + consumo normal
-  WARM_LOW: 'warm_low',           // Caliente + bajo consumo
-  WARM_HIGH: 'warm_high',         // Caliente + alto consumo
-  CRITICAL: 'critical'            // Temperatura crítica + consumo crítico
+  COLD_LOW: 'cold_low', // Frío + bajo consumo
+  COLD_HIGH: 'cold_high', // Frío + alto consumo
+  OPTIMAL: 'optimal', // Temperatura normal + consumo normal
+  WARM_LOW: 'warm_low', // Caliente + bajo consumo
+  WARM_HIGH: 'warm_high', // Caliente + alto consumo
+  CRITICAL: 'critical' // Temperatura crítica + consumo crítico
 };
 
 /**
@@ -122,24 +122,24 @@ export const ENERGY_BAR_SETTINGS = {
   barWidth: 0.08,
   barHeight: 1.0,
   barDepth: 0.08,
-  
+
   // Bar spacing
   barSpacing: 0.25,
-  
+
   // Arc settings
   arcCount: 3,
   arcRadius: 0.3,
   arcThickness: 0.02,
-  
+
   // Animation
   pulseSpeed: 1.5,
   flowSpeed: 1.0,
   arcSpeed: 2.0,
-  
+
   // Distortion
   distortionIntensity: 0.1,
   distortionSpeed: 1.0,
-  
+
   // Glow
   glowDistance: 4,
   glowDecay: 2
@@ -155,7 +155,7 @@ export const calculateEnergyState = (temperature, powerConsumption) => {
   const isCold = temperature < 20;
   const isWarm = temperature > 24;
   const isCriticalTemp = temperature < 16 || temperature > 28;
-  
+
   const isLowPower = powerConsumption < 130;
   const isHighPower = powerConsumption > 140;
   const isCriticalPower = powerConsumption > 160;
@@ -197,7 +197,7 @@ export const calculateEnergyState = (temperature, powerConsumption) => {
 export const getEnergyConfig = (floor) => {
   const state = calculateEnergyState(floor.temperature, floor.powerConsumption);
   const config = ENERGY_VISUALS[state];
-  
+
   return {
     state,
     config,

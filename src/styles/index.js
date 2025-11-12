@@ -1,25 +1,25 @@
 /**
  * Centralized Style System Exports
- * 
+ *
  * Usage:
  * import { theme, spacing, GlobalStyles, mixins } from '../styles';
  */
 
 // Design Tokens (using scssTokens for SCSS parity)
-export { 
-  spacing, 
-  colors, 
-  fonts, 
-  weights, 
-  fontSize, 
-  getOpacity, 
-  size, 
-  fontWeight, 
-  textStyle, 
-  getContrastColor, 
-  contrastText, 
-  scssBreakpoints as breakpoints, 
-  scssMedia as media 
+export {
+  spacing,
+  colors,
+  fonts,
+  weights,
+  fontSize,
+  getOpacity,
+  size,
+  fontWeight,
+  textStyle,
+  getContrastColor,
+  contrastText,
+  scssBreakpoints as breakpoints,
+  scssMedia as media
 } from './scssTokens';
 
 // Theme (colors, typography)

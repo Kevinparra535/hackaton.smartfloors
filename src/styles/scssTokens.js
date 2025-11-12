@@ -60,11 +60,11 @@ export const colors = {
   success: '#00ff88',
   bg_card: 'rgba(26, 26, 26, 0.95)',
   border: 'rgba(100, 108, 255, 0.3)',
-  
+
   // Predictive alert colors
   predictive_critical: '#9d4edd', // Purple
-  predictive_warning: '#646cff',  // Blue
-  predictive_normal: '#00b4d8'    // Cyan
+  predictive_warning: '#646cff', // Blue
+  predictive_normal: '#00b4d8' // Cyan
 };
 
 // Typography tokens
@@ -91,9 +91,8 @@ export const fontSize = (px) => {
   `;
 };
 
-export const getOpacity = (colorCss, amount) => `color-mix(in srgb, ${colorCss} ${
-  Math.max(0, Math.min(1, amount)) * 100
-}%, transparent)`;
+export const getOpacity = (colorCss, amount) =>
+  `color-mix(in srgb, ${colorCss} ${Math.max(0, Math.min(1, amount)) * 100}%, transparent)`;
 
 // Size mixin (SCSS parity): size(width[, height])
 const toCssSize = (v) => (typeof v === 'number' ? `${v}px` : v);
@@ -104,8 +103,7 @@ export const size = (width, height) => css`
 `;
 
 // Text style mixins (SCSS parity): transform/decoration/weight shortcuts
-export const fontWeight = (key) =>
-  typeof key === 'number' ? key : weights[key];
+export const fontWeight = (key) => (typeof key === 'number' ? key : weights[key]);
 
 export const textStyle = (opts) => css`
   ${opts.transform ? `text-transform: ${opts.transform};` : ''}
@@ -165,7 +163,7 @@ const hslStringToRgb = (hsl) => {
   const l = parts[2].endsWith('%') ? parseFloat(parts[2]) / 100 : parseFloat(parts[2]);
   if ([h, s, l].some((v) => Number.isNaN(v))) return null;
   const c = (1 - Math.abs(2 * l - 1)) * s;
-  const hh = ((h % 360) + 360) % 360 / 60;
+  const hh = (((h % 360) + 360) % 360) / 60;
   const x = c * (1 - Math.abs((hh % 2) - 1));
   let r1 = 0,
     g1 = 0,
@@ -177,7 +175,11 @@ const hslStringToRgb = (hsl) => {
   else if (hh >= 4 && hh < 5) [r1, g1, b1] = [x, 0, c];
   else [r1, g1, b1] = [c, 0, x];
   const m0 = l - c / 2;
-  return { r: clamp255((r1 + m0) * 255), g: clamp255((g1 + m0) * 255), b: clamp255((b1 + m0) * 255) };
+  return {
+    r: clamp255((r1 + m0) * 255),
+    g: clamp255((g1 + m0) * 255),
+    b: clamp255((b1 + m0) * 255)
+  };
 };
 
 const toRgb = (color) => {
@@ -196,10 +198,7 @@ const relativeLuminance = ({ r, g, b }) => {
   return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
 };
 
-export const getContrastColor = (
-  background,
-  options
-) => {
+export const getContrastColor = (background, options) => {
   const light = options?.light ?? '#ffffff';
   const dark = options?.dark ?? '#000000';
   const strategy = options?.strategy ?? 'wcag';
