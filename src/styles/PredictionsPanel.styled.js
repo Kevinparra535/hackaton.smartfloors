@@ -1,14 +1,15 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import scssTokens from './scssTokens';
 
 export const Panel = styled.div`
   position: absolute;
   left: 10px;
-  background: ${({ theme }) => theme.background.secondary};
+  background: ${scssTokens.colors.bg_dark};
   border-radius: 12px;
   padding: 20px;
   width: 320px;
-  border: 1px solid ${({ theme }) => theme.border.subtle};
+  border: 1px solid ${scssTokens.colors.primary};
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   max-height: 100dvh;
   overflow-y: auto;
@@ -55,7 +56,8 @@ export const TimeSelector = styled.div`
 export const TimeButton = styled.button`
   padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid ${({ $active, theme }) => ($active ? theme.colors.primary : theme.border.default)};
+  border: 1px solid
+    ${({ $active, theme }) => ($active ? theme.colors.primary : theme.border.default)};
   background: ${({ $active, theme }) =>
     $active ? theme.colors.primaryLight : 'rgba(100, 108, 255, 0.1)'};
   color: ${({ $active, theme }) => ($active ? theme.text.primary : theme.text.secondary)};

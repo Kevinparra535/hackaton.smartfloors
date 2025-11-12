@@ -1,10 +1,10 @@
 import { SelectorContainer, SelectorLabel, Select } from '../styles/VisualizationControls.styled';
 
 const MODES = [
-  { value: 'heat_layer', label: '🌈 Capas de Color', emoji: '🌈' },
-  { value: 'volumetric', label: '💨 Niebla Térmica', emoji: '💨' },
-  { value: 'energy_bars', label: '⚡ Barras de Energía', emoji: '⚡' },
-  { value: 'hybrid', label: '🔥 Híbrido', emoji: '🔥' }
+  { value: 'heat_layer', label: 'Capas de Color' },
+  { value: 'volumetric', label: 'Niebla Térmica' },
+  { value: 'energy_bars', label: 'Barras de Energía' },
+  { value: 'hybrid', label: 'Híbrido' }
 ];
 
 /**
@@ -21,9 +21,6 @@ const VisualizationSelector = ({ currentMode, onModeChange }) => {
 
   return (
     <SelectorContainer>
-      <SelectorLabel htmlFor='viz-mode-select'>
-        Visualización:
-      </SelectorLabel>
       <Select
         id='viz-mode-select'
         value={currentMode}

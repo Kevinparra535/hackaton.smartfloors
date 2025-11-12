@@ -13,8 +13,9 @@ import EnergyBars from './EnergyBars';
  * @param {Object} props.data - Floor data (floorId, name, temperature, humidity, powerConsumption, occupancy, status)
  * @param {number} props.position - Y position of the floor
  * @param {Function} props.onHover - Callback when floor is hovered
+ * @param {Function} props.onClick - Callback when floor is clicked for zoom
  */
-export default function FloorBlock({ data, position, onHover }) {
+export default function FloorBlock({ data, position, onHover, onClick }) {
   const meshRef = useRef();
   const materialRef = useRef();
   const isHoveredRef = useRef(false);
@@ -87,6 +88,19 @@ export default function FloorBlock({ data, position, onHover }) {
     }
   };
 
+  // Handle click for zoom functionality
+  const handleClick = (event) => {
+    event.stopPropagation(); // Prevent event bubbling
+    
+    if (onClick) {
+      onClick({ 
+        floorData: data, 
+        floorY: position,
+        floorId: data.floorId 
+      });
+    }
+  };
+
   // Update material colors when heat state changes
   useEffect(() => {
     if (materialRef.current) {
@@ -123,6 +137,7 @@ export default function FloorBlock({ data, position, onHover }) {
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
         onPointerMove={handlePointerOver}
+        onPointerDown={handleClick}
         castShadow
         receiveShadow
       >

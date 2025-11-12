@@ -47,10 +47,7 @@ const Header = ({ isConnected, currentMode, onModeChange }) => {
         <TabLink to='/analytics'>📊 Análisis</TabLink>
       </Nav>
 
-      <VisualizationSelector 
-        currentMode={currentMode} 
-        onModeChange={onModeChange}
-      />
+      <VisualizationSelector currentMode={currentMode} onModeChange={onModeChange} />
 
       <ConnectionStatus $connected={isConnected}>
         {isConnected ? 'Conectado' : 'Desconectado'}

@@ -30,17 +30,33 @@ const Home = () => {
   const { floorData, predictions, alerts, isLoading, currentMode } = useOutletContext();
 
   const [hoveredFloor, setHoveredFloor] = useState(null);
+  const [focusedFloor, setFocusedFloor] = useState(null);
 
-  const displayedFloor = !isLoading && (hoveredFloor || floorData[1]);
-  const displayedPredictions = hoveredFloor ? predictions[hoveredFloor.floorId] : predictions[1];
+  const handleFloorClick = (clickData) => {
+    // Store the clicked floor for potential UI updates
+    setFocusedFloor(clickData?.floorData || null);
+  };
+
+  const displayedFloor = !isLoading && (hoveredFloor || focusedFloor || floorData[1]);
+  const displayedPredictions = hoveredFloor 
+    ? predictions[hoveredFloor.floorId] 
+    : focusedFloor 
+      ? predictions[focusedFloor.floorId]
+      : predictions[1];
   const displayedFloorName = hoveredFloor
     ? hoveredFloor.name || `Piso ${hoveredFloor.floorId}`
-    : null;
+    : focusedFloor
+      ? focusedFloor.name || `Piso ${focusedFloor.floorId}`
+      : null;
 
   return (
     <MainContent>
       <CanvasWrapper>
-        <Dashboard3D floorData={floorData} onFloorHover={setHoveredFloor} />
+        <Dashboard3D 
+          floorData={floorData} 
+          onFloorHover={setHoveredFloor}
+          onFloorClick={handleFloorClick}
+        />
       </CanvasWrapper>
 
       {/* Color Legend - Leyenda de estados */}

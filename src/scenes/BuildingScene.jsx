@@ -3,16 +3,33 @@ import { EffectComposer, Bloom, DepthOfField, Vignette } from '@react-three/post
 import FloorBlock from '../components/FloorBlock';
 import FloatingParticles from '../components/FloatingParticles';
 import GradientBackground from '../components/GradientBackground';
+import { useCameraZoom } from '../hooks/useCameraZoom';
+import { useRef } from 'react';
 
 /**
  * BuildingScene - 3D scene containing all floor blocks with immersive effects
  * @param {Object} props
  * @param {Object} props.floorData - Data for all floors
  * @param {Function} props.onFloorHover - Callback when a floor is hovered
+ * @param {Function} props.onFloorClick - Callback when a floor is clicked for zoom
  */
-const BuildingScene = ({ floorData, onFloorHover }) => {
+const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
+  const controlsRef = useRef();
+  const { zoomToFloor, resetCamera } = useCameraZoom();
+  
   const handleHover = (data) => {
     onFloorHover(data);
+  };
+
+  const handleClick = (clickData) => {
+    if (onFloorClick) {
+      onFloorClick(clickData);
+    }
+    
+    // Zoom camera to the clicked floor (or reset if same floor)
+    if (clickData?.floorY !== undefined && clickData?.floorId !== undefined) {
+      zoomToFloor(clickData.floorY, clickData.floorId);
+    }
   };
 
   // Calculate Y positions for floors (stacked vertically)
@@ -66,6 +83,7 @@ const BuildingScene = ({ floorData, onFloorHover }) => {
               data={floor}
               position={getFloorPosition(floor.floorId)}
               onHover={handleHover}
+              onClick={handleClick}
             />
           ))
         : // Show placeholder blocks while data is loading
@@ -83,11 +101,17 @@ const BuildingScene = ({ floorData, onFloorHover }) => {
               }}
               position={getFloorPosition(floorId)}
               onHover={handleHover}
+              onClick={handleClick}
             />
           ))}
 
       {/* Ground plane with enhanced materials */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -6, 0]} receiveShadow>
+      <mesh 
+        rotation={[-Math.PI / 2, 0, 0]} 
+        position={[0, -6, 0]} 
+        receiveShadow
+        onDoubleClick={resetCamera}
+      >
         <planeGeometry args={[30, 30]} />
         <meshStandardMaterial
           color='#0d0d0d'
@@ -106,6 +130,7 @@ const BuildingScene = ({ floorData, onFloorHover }) => {
 
       {/* Controls */}
       <OrbitControls
+        ref={controlsRef}
         enablePan={true}
         enableZoom={true}
         enableRotate={true}

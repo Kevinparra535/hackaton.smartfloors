@@ -7,11 +7,16 @@ import { Environment } from '@react-three/drei';
  * @param {Object} props
  * @param {Object} props.floorData - Floor data for visualization
  * @param {Function} props.onFloorHover - Callback for floor hover events
+ * @param {Function} props.onFloorClick - Callback for floor click events
  */
-const Dashboard3D = ({ floorData, onFloorHover }) => {
+const Dashboard3D = ({ floorData, onFloorHover, onFloorClick }) => {
   return (
     <Canvas shadows gl={{ antialias: true, alpha: false }} style={{}}>
-      <BuildingScene floorData={floorData} onFloorHover={onFloorHover} />
+      <BuildingScene 
+        floorData={floorData} 
+        onFloorHover={onFloorHover}
+        onFloorClick={onFloorClick}
+      />
     </Canvas>
   );
 };
