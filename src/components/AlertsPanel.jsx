@@ -119,27 +119,32 @@ export default function AlertsPanel({ alerts }) {
         {alerts.length === 0 ? (
           <EmptyState>Sin alertas por el momento. Todos los sistemas normales.</EmptyState>
         ) : (
-          alerts.map((alert) => (
-            <AlertItem
-              key={alert.id}
-              $severity={alert.status || alert.severity || 'normal'}
-              initial={{ opacity: 0, x: -20, height: 0 }}
-              animate={{ opacity: 1, x: 0, height: 'auto' }}
-              exit={{ opacity: 0, x: 20, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <AlertHeader>
-                <AlertFloor>
-                  {alert.floorName || alert.name || `Piso ${alert.floorId || alert.floor}`}
-                </AlertFloor>
-                <AlertTime>{formatTime(alert.timestamp)}</AlertTime>
-              </AlertHeader>
-              <AlertMessage>
-                {alert.message ||
-                  `${alert.type || 'Alerta'}: ${alert.value || 'Anomalía detectada'}`}
-              </AlertMessage>
-            </AlertItem>
-          ))
+          alerts.map((alert) => {
+            // Prioritize severity over status, normalize values
+            const severityValue = alert.severity || alert.status || 'normal';
+
+            return (
+              <AlertItem
+                key={alert.id}
+                $severity={severityValue}
+                initial={{ opacity: 0, x: -20, height: 0 }}
+                animate={{ opacity: 1, x: 0, height: 'auto' }}
+                exit={{ opacity: 0, x: 20, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <AlertHeader>
+                  <AlertFloor>
+                    {alert.floorName || alert.name || `Piso ${alert.floorId || alert.floor}`}
+                  </AlertFloor>
+                  <AlertTime>{formatTime(alert.timestamp)}</AlertTime>
+                </AlertHeader>
+                <AlertMessage>
+                  {alert.message ||
+                    `${alert.type || 'Alerta'}: ${alert.value || 'Anomalía detectada'}`}
+                </AlertMessage>
+              </AlertItem>
+            );
+          })
         )}
       </AnimatePresence>
     </Panel>

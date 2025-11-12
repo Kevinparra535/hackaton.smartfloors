@@ -30,26 +30,12 @@ export const useRealTimeData = () => {
           ...floor,
           status
         };
-        
-        console.log(`🏢 [Floor ${floor.floorId}] Status: ${status}`, {
-          temp: floor.temperature,
-          humidity: floor.humidity,
-          power: floor.powerConsumption,
-          status
-        });
       });
 
       setFloorData(updatedFloors);
     } else if (data.floorId) {
       const status = getFloorStatus(data);
-      
-      console.log(`🏢 [Floor ${data.floorId}] Updated Status: ${status}`, {
-        temp: data.temperature,
-        humidity: data.humidity,
-        power: data.powerConsumption,
-        status
-      });
-      
+
       setFloorData((prev) => ({
         ...prev,
         [data.floorId]: {
@@ -61,8 +47,6 @@ export const useRealTimeData = () => {
   }, []);
 
   const handleAlert = useCallback((alertData) => {
-    console.log('🚨 [handleAlert] Received alert data:', alertData);
-
     if (alertData.alerts && Array.isArray(alertData.alerts)) {
       const allNewAlerts = [];
 
@@ -72,7 +56,7 @@ export const useRealTimeData = () => {
             // Validate severity values
             const normalizedSeverity = anomaly.severity?.toLowerCase();
             const displaySeverity = mapSeverityToStatus(normalizedSeverity);
-            
+
             const newAlert = {
               id: `${alertGroup.floorId}_${alertGroup.timestamp}_${index}`,
               floorId: alertGroup.floorId,
@@ -86,21 +70,11 @@ export const useRealTimeData = () => {
               timestamp: anomaly.timestamp || alertGroup.timestamp
             };
 
-            console.log(`  ⚠️ [Anomaly] ${anomaly.type} - ${anomaly.severity} → ${displaySeverity}:`, {
-              floorId: alertGroup.floorId,
-              type: anomaly.type,
-              originalSeverity: anomaly.severity,
-              normalizedSeverity: displaySeverity,
-              value: anomaly.value,
-              message: anomaly.message
-            });
-
             allNewAlerts.push(newAlert);
           });
         }
       });
 
-      console.log(`✅ [handleAlert] Total alerts processed: ${allNewAlerts.length}`);
       setAlerts((prev) => [...allNewAlerts, ...prev].slice(0, 10));
     } else {
       console.warn('⚠️ [handleAlert] Invalid alert data - missing alerts array');
@@ -152,7 +126,7 @@ export const useRealTimeData = () => {
                 // Normalize severity for consistency
                 const normalizedSeverity = anomaly.severity?.toLowerCase();
                 const displaySeverity = mapSeverityToStatus(normalizedSeverity);
-                
+
                 formattedAlerts.push({
                   id: `${alertGroup.floorId}_${alertGroup.timestamp}_${index}`,
                   floorId: alertGroup.floorId,
@@ -170,7 +144,6 @@ export const useRealTimeData = () => {
           });
 
           formattedAlerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-          console.log(`📊 [Initial Load] Loaded ${formattedAlerts.length} alerts`);
           setAlerts(formattedAlerts.slice(0, 10));
         } catch (alertError) {
           console.warn('⚠️ [useRealTimeData] Could not load alerts:', alertError.message);

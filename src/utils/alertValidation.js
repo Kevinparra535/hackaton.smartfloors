@@ -9,12 +9,19 @@
  * @returns {string} Frontend status (danger, warning, normal)
  */
 export const mapSeverityToStatus = (severity) => {
+  if (!severity) return 'normal';
+
+  const normalized = severity.toLowerCase();
   const mapping = {
     critical: 'danger',
+    danger: 'danger',
     warning: 'warning',
     normal: 'normal'
   };
-  return mapping[severity] || 'normal';
+
+  const result = mapping[normalized] || 'normal';
+
+  return result;
 };
 
 /**
@@ -40,7 +47,7 @@ export const mapStatusToSeverity = (status) => {
  */
 export const validateAlertConcordance = (floor, alertSeverity, alertType) => {
   const { temperature, humidity, powerConsumption } = floor;
-  
+
   let expectedSeverity = 'normal';
   let reason = '';
 
@@ -82,8 +89,8 @@ export const validateAlertConcordance = (floor, alertSeverity, alertType) => {
     expectedSeverity,
     actualSeverity: alertSeverity,
     reason,
-    message: isValid 
-      ? `✅ Alert severity matches metrics` 
+    message: isValid
+      ? `✅ Alert severity matches metrics`
       : `⚠️ Mismatch: Expected ${expectedSeverity}, got ${alertSeverity}. ${reason}`
   };
 };
@@ -95,7 +102,7 @@ export const validateAlertConcordance = (floor, alertSeverity, alertType) => {
  */
 export const getSeverityColor = (severity) => {
   const normalized = severity?.toLowerCase();
-  
+
   if (normalized === 'danger' || normalized === 'critical') {
     return '#ff4d4f'; // Red
   }
