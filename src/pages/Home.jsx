@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Dashboard3D from '../components/Dashboard3D';
 import AlertsPanel from '../components/AlertsPanel';
 import PredictionsPanel from '../components/PredictionsPanel';
+import ColorLegend from '../components/ColorLegend';
 
 import {
   InfoPanel,
@@ -26,7 +27,7 @@ const EmptyInfo = styled.div`
 `;
 
 const Home = () => {
-  const { floorData, predictions, alerts, isLoading } = useOutletContext();
+  const { floorData, predictions, alerts, isLoading, currentMode } = useOutletContext();
 
   const [hoveredFloor, setHoveredFloor] = useState(null);
 
@@ -41,6 +42,9 @@ const Home = () => {
       <CanvasWrapper>
         <Dashboard3D floorData={floorData} onFloorHover={setHoveredFloor} />
       </CanvasWrapper>
+
+      {/* Color Legend - Leyenda de estados */}
+      <ColorLegend currentMode={currentMode} />
 
       <InfoPanel>
         <InfoTitle>

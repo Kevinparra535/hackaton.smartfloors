@@ -88,7 +88,8 @@ export default [
             'distance',
             'decay',
             'outlineWidth',
-            'outlineColor'
+            'outlineColor',
+            'depthWrite'
           ]
         }
       ]

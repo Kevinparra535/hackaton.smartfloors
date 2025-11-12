@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { ConnectionStatus, HeaderStyled, Title } from '../styles/Header.styled';
+import VisualizationSelector from '../components/VisualizationSelector';
 
 const Nav = styled.nav`
   display: flex;
@@ -34,7 +35,7 @@ const TabLink = styled(NavLink)`
   }
 `;
 
-const Header = ({ isConnected }) => {
+const Header = ({ isConnected, currentMode, onModeChange }) => {
   return (
     <HeaderStyled>
       <Title>SmartFloors AI</Title>
@@ -45,6 +46,11 @@ const Header = ({ isConnected }) => {
         </TabLink>
         <TabLink to='/analytics'>📊 Análisis</TabLink>
       </Nav>
+
+      <VisualizationSelector 
+        currentMode={currentMode} 
+        onModeChange={onModeChange}
+      />
 
       <ConnectionStatus $connected={isConnected}>
         {isConnected ? 'Conectado' : 'Desconectado'}

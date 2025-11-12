@@ -5,6 +5,7 @@ import Header from './Header';
 import SocketDebugger from '../components/SocketDebugger';
 
 import { useRealTimeData } from '../hooks/useRealTimeData';
+import { useVisualizationMode } from '../hooks/useVisualizationMode';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -58,6 +59,7 @@ const LoadingText = styled.div`
 
 const Layout = () => {
   const { floorData, predictions, alerts, isConnected, isLoading } = useRealTimeData();
+  const { currentMode, setVisualizationMode } = useVisualizationMode();
 
   // Show loading screen while fetching initial data
   if (isLoading) {
@@ -71,11 +73,15 @@ const Layout = () => {
 
   return (
     <LayoutContainer>
-      <Header isConnected={isConnected} />
+      <Header
+        isConnected={isConnected}
+        currentMode={currentMode}
+        onModeChange={setVisualizationMode}
+      />
       <Main>
-        <Outlet context={{ floorData, predictions, alerts, isLoading }} />
+        <Outlet context={{ floorData, predictions, alerts, isLoading, currentMode }} />
       </Main>
-      <SocketDebugger />
+      {/* <SocketDebugger /> */}
     </LayoutContainer>
   );
 };

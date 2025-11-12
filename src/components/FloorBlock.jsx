@@ -1,8 +1,11 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import * as THREE from 'three';
 import { getFloorHeatConfig } from '../config/heatLayerConfig';
+import { getVolumetricConfig, VISUALIZATION_MODES } from '../config/visualizationModes';
+import { getEnergyConfig } from '../config/energyBarsConfig';
+import VolumetricFog from './VolumetricFog';
+import EnergyBars from './EnergyBars';
 
 /**
  * FloorBlock component - 3D representation of a building floor with Heat Layer visualization
@@ -16,9 +19,41 @@ export default function FloorBlock({ data, position, onHover }) {
   const materialRef = useRef();
   const isHoveredRef = useRef(false);
 
+  // Estado reactivo para el modo de visualización
+  const [visualizationMode, setVisualizationMode] = useState(() => {
+    return localStorage.getItem('smartfloors-viz-mode') || VISUALIZATION_MODES.VOLUMETRIC;
+  });
+
   // Get heat layer configuration for this floor
   const heatConfig = getFloorHeatConfig(data.floorId);
   const { state, colors, settings, shouldPulse } = heatConfig;
+
+  // Get volumetric configuration
+  const volumetricData = getVolumetricConfig(state);
+  
+  // Get energy bars configuration
+  const energyData = getEnergyConfig(data);
+  
+  // Determinar qué mostrar basado en el modo actual
+  const showVolumetric = visualizationMode === VISUALIZATION_MODES.VOLUMETRIC;
+  const showHeatLayer = visualizationMode === VISUALIZATION_MODES.HEAT_LAYER;
+  const showEnergyBars = visualizationMode === VISUALIZATION_MODES.ENERGY_BARS ||
+                        visualizationMode === VISUALIZATION_MODES.HYBRID;
+
+  // Escuchar cambios de modo de visualización
+  useEffect(() => {
+    const handleModeChange = (event) => {
+      const newMode = event.detail.mode;
+      console.log(`🔄 [FloorBlock ${data.floorId}] Modo cambiado a: ${newMode}`);
+      setVisualizationMode(newMode);
+    };
+
+    window.addEventListener('visualizationModeChange', handleModeChange);
+    
+    return () => {
+      window.removeEventListener('visualizationModeChange', handleModeChange);
+    };
+  }, [data.floorId]);
 
   // Log heat layer state for debugging
   useEffect(() => {
@@ -94,27 +129,45 @@ export default function FloorBlock({ data, position, onHover }) {
         <boxGeometry args={[3, 1.5, 3]} />
         <meshStandardMaterial
           ref={materialRef}
-          color={colors.primary}
-          emissive={colors.emissive}
-          emissiveIntensity={settings.emissiveIntensity[state]}
+          color={showHeatLayer ? colors.primary : '#1a1a1a'}
+          emissive={showHeatLayer ? colors.emissive : '#000000'}
+          emissiveIntensity={showHeatLayer ? settings.emissiveIntensity[state] : 0}
           metalness={0.6}
           roughness={0.3}
           envMapIntensity={1}
           transparent
-          opacity={settings.mainOpacity}
+          opacity={showHeatLayer ? settings.mainOpacity : (showEnergyBars ? 0.3 : 0.4)}
         />
       </mesh>
 
       {/* Outer glow effect with gradient secondary color */}
-      <mesh scale={[1.05, 1.05, 1.05]}>
-        <boxGeometry args={[3, 1.5, 3]} />
-        <meshBasicMaterial
-          color={colors.secondary}
-          transparent
-          opacity={0.15}
-          wireframe
+      {showHeatLayer && (
+        <mesh scale={[1.05, 1.05, 1.05]}>
+          <boxGeometry args={[3, 1.5, 3]} />
+          <meshBasicMaterial
+            color={colors.secondary}
+            transparent
+            opacity={0.15}
+            wireframe
+          />
+        </mesh>
+      )}
+
+      {/* Volumetric Fog - Internal thermal smoke/fog */}
+      {showVolumetric && (
+        <VolumetricFog 
+          config={volumetricData.config} 
+          settings={volumetricData.settings}
         />
-      </mesh>
+      )}
+
+      {/* Energy Bars - Temperature + Power Consumption visualization */}
+      {showEnergyBars && (
+        <EnergyBars
+          config={energyData.config}
+          settings={energyData.settings}
+        />
+      )}
 
       {/* Floor label with better visibility */}
       <Text
@@ -130,38 +183,44 @@ export default function FloorBlock({ data, position, onHover }) {
       </Text>
 
       {/* Heat state indicator sphere */}
-      <mesh position={[1.6, 0, 0]}>
-        <sphereGeometry args={[0.15, 16, 16]} />
-        <meshStandardMaterial 
-          color={colors.primary} 
-          emissive={colors.emissive} 
-          emissiveIntensity={settings.emissiveIntensity[state] * 2}
-          metalness={0.8}
-          roughness={0.2}
-        />
-      </mesh>
+      {showHeatLayer && (
+        <mesh position={[1.6, 0, 0]}>
+          <sphereGeometry args={[0.15, 16, 16]} />
+          <meshStandardMaterial 
+            color={colors.primary} 
+            emissive={colors.emissive} 
+            emissiveIntensity={settings.emissiveIntensity[state] * 2}
+            metalness={0.8}
+            roughness={0.2}
+          />
+        </mesh>
+      )}
 
       {/* Ambient light based on heat state */}
-      <pointLight 
-        position={[0, 0, 0]} 
-        color={colors.emissive} 
-        intensity={settings.pointLightIntensity[state]}
-        distance={settings.pointLightDistance}
-        decay={2}
-      />
+      {showHeatLayer && (
+        <pointLight 
+          position={[0, 0, 0]} 
+          color={colors.emissive} 
+          intensity={settings.pointLightIntensity[state]}
+          distance={settings.pointLightDistance}
+          decay={2}
+        />
+      )}
 
       {/* Heat state label (small text showing current state) */}
-      <Text
-        position={[0, -0.9, 0]}
-        fontSize={0.15}
-        color={colors.primary}
-        anchorX='center'
-        anchorY='middle'
-        outlineWidth={0.01}
-        outlineColor='#000000'
-      >
-        {state.replace('_', ' ').toUpperCase()}
-      </Text>
+      {showHeatLayer && (
+        <Text
+          position={[0, -0.9, 0]}
+          fontSize={0.15}
+          color={colors.primary}
+          anchorX='center'
+          anchorY='middle'
+          outlineWidth={0.01}
+          outlineColor='#000000'
+        >
+          {state.replace('_', ' ').toUpperCase()}
+        </Text>
+      )}
     </group>
   );
 }
