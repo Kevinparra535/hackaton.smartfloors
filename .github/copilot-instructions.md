@@ -1,7 +1,7 @@
 # Copilot Instructions for SmartFloors AI
 
 ## Project Overview
-SmartFloors AI is a real-time 3D building monitoring dashboard built with React 19 + Vite + React Three Fiber. It visualizes environmental and energy conditions for 3 floors, detecting anomalies through color-coded 3D visualizations and live alerts for temperature, humidity, and energy consumption.
+SmartFloors AI is a real-time 3D building monitoring dashboard built with React 19 + Vite + React Three Fiber. It visualizes environmental and energy conditions for **5 floors**, detecting anomalies through color-coded 3D visualizations, live alerts, and ML-powered predictions for temperature, humidity, occupancy, and power consumption.
 
 ## Tech Stack & Architecture
 - **React 19.2.0** with React DOM (latest features including `createRoot`)
@@ -30,20 +30,22 @@ SmartFloors AI is a real-time 3D building monitoring dashboard built with React 
 ```
 src/
   api/
-    socket.js         # WebSocket connection to backend (Socket.IO)
+    socket.js          # WebSocket connection to backend (Socket.IO)
+    rest.js            # REST API client for HTTP requests
   components/
-    FloorBlock.jsx    # 3D floor visualization with status colors
-    AlertsPanel.jsx   # Animated alerts list (Framer Motion)
-    Dashboard3D.jsx   # Canvas wrapper for 3D scene
+    FloorBlock.jsx     # 3D floor visualization with status colors
+    AlertsPanel.jsx    # Animated alerts list (Framer Motion)
+    PredictionsPanel.jsx # ML predictions display with time selector
+    Dashboard3D.jsx    # Canvas wrapper for 3D scene
+    SocketDebugger.jsx # WebSocket debugging panel (dev tool)
   hooks/
-    useRealTimeData.js # Custom hook for floor data + alerts
+    useRealTimeData.js # Hybrid REST + WebSocket data management
   scenes/
-    BuildingScene.jsx  # Complete 3D scene with floors + lighting
-  ui/
-    App.jsx           # Main app component with layout
-  index.css           # Global styles (dark theme)
-  main.jsx            # Entry point with StrictMode
-  assets/             # Static assets (images, SVGs)
+    BuildingScene.jsx  # Complete 3D scene with 5 floors + lighting
+  App.jsx              # Main app component with layout
+  index.css            # Global styles (dark theme)
+  main.jsx             # Entry point with StrictMode
+  assets/              # Static assets (images, SVGs)
 ```
 
 ## Code Conventions
@@ -86,13 +88,25 @@ src/
 - **Lighting setup** - ambient + directional + point lights in `BuildingScene.jsx`
 
 ### WebSocket Integration
-- **Socket.IO Client** - connects to `ws://localhost:3000/realtime`
+- **Socket.IO Client** - connects to `http://localhost:3000`
 - **Event listeners**:
-  - `floorData` - receives floor updates `{ floor, temperature, humidity, energy, status }`
-  - `alert` - receives alert notifications
+  - `floorData` - receives floor updates with array of 5 floors
+  - `alert` - receives alert notifications with anomalies array
+  - `predictions` - receives ML predictions for all floors
 - **Auto-reconnection** - 5 attempts with 1s delay
 - **Connection singleton** - `getSocket()` ensures single instance
 - **Cleanup pattern** - disconnect on component unmount
+
+### REST API Integration
+- **Base URL** - `http://localhost:3000/api/v1`
+- **Endpoints used**:
+  - `GET /floors` - Initial load of all floor data
+  - `GET /floors/:id` - Single floor details
+  - `GET /floors/:id/predictions?minutesAhead=60` - ML predictions
+  - `GET /floors/:id/history?limit=60` - Historical data
+  - `GET /alerts` - All active alerts
+- **Hybrid approach** - REST for initial load, WebSocket for real-time updates
+- **Error handling** - Try/catch with fallback to initial data
 
 ### Styling Approach
 - **Styled-components** - primary styling method for components
@@ -134,6 +148,10 @@ src/
 ### State Management
 - Use React hooks (`useState`, `useEffect`, `useCallback`) directly
 - Create custom hooks in `src/hooks/` for reusable logic
+- **useRealTimeData** - Main data hook that combines REST API + WebSocket
+- No Redux/Zustand - hooks sufficient for current scope
+- **Loading states** - `isLoading` for initial data fetch
+- **Connection state** - `isConnected` for WebSocket status
 - WebSocket data flows through `useRealTimeData` hook
 - No Redux/Zustand - hooks sufficient for current scope
 
@@ -142,6 +160,14 @@ src/
 - Create subscription functions (e.g., `subscribeToNewEvent`)
 - Handle events in `useRealTimeData` hook
 - Update component state with callbacks
+- **Current events**: `floorData`, `alert`, `predictions`
+
+### REST API Calls
+- Add new API functions in `src/api/rest.js`
+- Use `apiFetch` wrapper for consistent error handling
+- Call from `useRealTimeData` hook or components
+- Handle loading and error states
+- **Current endpoints**: `/floors`, `/floors/:id`, `/predictions`, `/alerts`, `/history`
 
 ### Environment & Build
 - Vite handles HMR automatically - save JSX files to see instant updates
@@ -159,6 +185,8 @@ src/
 8. **WebSocket cleanup**: Always disconnect socket in cleanup function
 9. **Framer Motion**: Use `AnimatePresence` for exit animations, `motion` for animated elements
 10. **Status mapping**: Use object literals for status → color/text mapping
+11. **REST + WebSocket**: Load initial data with REST, update in real-time with WebSocket
+12. **Alert structure**: Backend sends `anomalies` array - process each as individual alert
 
 ## What NOT to Do
 - Don't add TypeScript without discussing migration strategy

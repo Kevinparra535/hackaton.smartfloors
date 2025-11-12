@@ -52,6 +52,13 @@ const LoadingText = styled.div`
   font-weight: 500;
 `;
 
+const EmptyInfo = styled.div`
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9rem;
+`;
+
 function App() {
   const { floorData, predictions, alerts, isConnected, isLoading } = useRealTimeData();
   const [hoveredFloor, setHoveredFloor] = useState(null);

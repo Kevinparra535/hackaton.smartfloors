@@ -15,7 +15,7 @@ const BuildingScene = ({ floorData, onFloorHover }) => {
   // Calculate Y positions for floors (stacked vertically)
   const getFloorPosition = (floorNumber) => {
     // Center the building vertically (5 floors)
-    return (floorNumber - 3) * 1.2; // Space floors 1.2 units apart
+    return (floorNumber - 3) * 1; // Space floors 1.2 units apart
   };
 
   return (

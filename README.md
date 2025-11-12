@@ -40,28 +40,27 @@ src/
 
 ## 🚀 Getting Started
 
+### Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+**App runs on http://localhost:5173**
+
+**📖 Prefer a guided setup?** Check **[QUICK_START.md](./QUICK_START.md)** for step-by-step instructions.
+
 ### Prerequisites
 
 - **Node.js 18+** and **npm**
 - **Backend server** running on `http://localhost:3000`
   - REST API: `http://localhost:3000/api/v1`
   - WebSocket: Socket.IO on port 3000
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-```
-
-### Development
-
-```bash
-# Start development server
-npm run dev
-```
-
-App runs on **http://localhost:5173**
+  - Verified working - see **[ENDPOINT_TESTS.md](./ENDPOINT_TESTS.md)**
 
 ### Build for Production
 
@@ -274,10 +273,17 @@ npm run format:check
 
 ## 📚 Documentation
 
-- **[API_INTEGRATION.md](./API_INTEGRATION.md)** - Complete REST API + WebSocket guide
-- **[DATA_INTEGRATION.md](./DATA_INTEGRATION.md)** - Data structures and processing
-- **[PREDICTIONS.md](./PREDICTIONS.md)** - ML predictions system documentation
-- **[.github/copilot-instructions.md](./.github/copilot-instructions.md)** - AI coding agent guidelines
+### For Users
+- **[QUICK_START.md](./QUICK_START.md)** - 🚀 Get started in 3 steps
+- **[README.md](./README.md)** - 📖 This file - Complete technical overview
+
+### For Developers
+- **[API_INTEGRATION.md](./API_INTEGRATION.md)** - 📡 Complete REST API + WebSocket guide with examples
+- **[DATA_INTEGRATION.md](./DATA_INTEGRATION.md)** - 📊 Data structures and processing logic
+- **[PREDICTIONS.md](./PREDICTIONS.md)** - 🔮 ML predictions system documentation
+- **[ENDPOINT_TESTS.md](./ENDPOINT_TESTS.md)** - ✅ Verified endpoint tests and results
+- **[INTEGRATION_STATUS.md](./INTEGRATION_STATUS.md)** - 📋 Integration checklist and status
+- **[.github/copilot-instructions.md](./.github/copilot-instructions.md)** - 🤖 AI coding agent guidelines
 
 ## 🤝 Contributing
 

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const Header = styled.header`
   background: rgba(26, 26, 26, 0.95);

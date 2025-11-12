@@ -1,10 +1,55 @@
 # Integración de Datos - SmartFloors AI
 
+## 📡 Arquitectura de Datos
+
+### Flujo Híbrido: REST + WebSocket
+
+```
+Inicio de App
+    ↓
+REST API: GET /api/v1/floors (carga inicial)
+REST API: GET /api/v1/alerts (alertas iniciales)
+    ↓
+Renderiza Dashboard con datos reales
+    ↓
+WebSocket: Conecta a http://localhost:3000
+    ↓
+Escucha eventos en tiempo real:
+  - floorData (actualización de métricas)
+  - alert (nuevas alertas)
+  - predictions (nuevas predicciones ML)
+```
+
 ## 📡 Estructura de Datos del Backend
 
-### Evento: `floorData`
+### REST: `GET /api/v1/floors`
 
-El backend envía datos de todos los pisos en un solo objeto con el siguiente formato:
+Respuesta del backend:
+Respuesta del backend:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "buildingId": 1,
+      "buildingName": "Edificio Principal",
+      "floorId": 1,
+      "name": "Piso 1",
+      "occupancy": 64,
+      "temperature": 23.5,
+      "humidity": 34,
+      "powerConsumption": 129,
+      "timestamp": "2025-11-11T23:38:41.008Z"
+    }
+    // ... 4 pisos más (total: 5)
+  ],
+  "timestamp": "2025-11-11T23:39:31.957Z"
+}
+```
+
+### WebSocket: Evento `floorData`
+
+Estructura en tiempo real (igual formato):
 ```json
 {
   "floors": [
@@ -111,33 +156,101 @@ setFloorData(updatedFloors);
 }
 ```
 
-## 🚨 Alertas (Opcional)
+## 🚨 Alertas
 
-Si el backend envía alertas por separado, deben incluir:
+### REST: `GET /api/v1/alerts`
+
+**Estructura Real del Backend:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "alerts": [
+      {
+        "floorId": 4,
+        "floorName": "Piso 4",
+        "anomalies": [
+          {
+            "type": "humidity",
+            "severity": "critical",
+            "metric": "Humedad",
+            "value": 70,
+            "message": "Humedad muy alta: 70%",
+            "recommendation": "Activar deshumidificadores en Piso 4 de inmediato...",
+            "timestamp": "2025-11-11T22:56:41.009Z"
+          }
+        ],
+        "timestamp": "2025-11-11T22:56:41.009Z",
+        "severity": "critical"
+      }
+    ],
+    "count": 28
+  }
+}
+```
+
+### WebSocket: Evento `alert`
+
+**Estructura en Tiempo Real:**
 
 ```json
 {
   "floorId": 3,
   "floorName": "Piso 3",
-  "type": "temperature",
-  "severity": "danger",
-  "message": "Temperatura crítica detectada",
-  "value": 28.5,
-  "timestamp": "2025-11-11T23:15:00.000Z"
+  "anomalies": [
+    {
+      "type": "temperature",
+      "severity": "warning",
+      "metric": "Temperatura",
+      "value": 25.2,
+      "message": "Temperatura elevada: 25.2°C",
+      "recommendation": "Ajustar sistema de climatización...",
+      "timestamp": "2025-11-11T23:15:00.000Z"
+    }
+  ],
+  "timestamp": "2025-11-11T23:15:00.000Z",
+  "severity": "warning"
 }
 ```
 
-### Campos de Alerta
+**Nota Importante:** El backend envía alertas con array `anomalies`. El frontend procesa cada anomalía como una alerta individual.
 
-| Campo       | Tipo   | Requerido | Descripción                                   |
-| ----------- | ------ | --------- | --------------------------------------------- |
-| `floorId`   | number | ✅        | ID del piso afectado                          |
-| `floorName` | string | ❌        | Nombre del piso (opcional)                    |
-| `type`      | string | ❌        | Tipo de alerta (temperature, humidity, power) |
-| `severity`  | string | ❌        | Severidad (normal, warning, danger)           |
-| `message`   | string | ✅        | Mensaje descriptivo                           |
-| `value`     | number | ❌        | Valor que generó la alerta                    |
-| `timestamp` | string | ✅        | Timestamp ISO 8601                            |
+### Procesamiento de Alertas en Frontend
+
+```javascript
+// En useRealTimeData.js
+const handleAlert = useCallback((alertData) => {
+  // Procesar array de anomalies
+  if (alertData.anomalies && Array.isArray(alertData.anomalies)) {
+    const newAlerts = alertData.anomalies.map((anomaly, index) => ({
+      id: `${alertData.floorId}_${alertData.timestamp}_${index}`,
+      floorId: alertData.floorId,
+      floorName: alertData.floorName,
+      type: anomaly.type,
+      severity: anomaly.severity,
+      message: anomaly.message,
+      value: anomaly.value,
+      recommendation: anomaly.recommendation,
+      timestamp: anomaly.timestamp || alertData.timestamp
+    }));
+
+    setAlerts((prev) => [...newAlerts, ...prev].slice(0, 10));
+  }
+}, []);
+```
+
+### Campos de Anomalía
+
+| Campo            | Tipo   | Descripción                                       |
+| ---------------- | ------ | ------------------------------------------------- |
+| `type`           | string | Tipo de anomalía (humidity, temperature, power)   |
+| `severity`       | string | Severidad (critical, warning)                     |
+| `metric`         | string | Nombre del métrico en español                     |
+| `value`          | number | Valor que generó la anomalía                      |
+| `message`        | string | Mensaje descriptivo                               |
+| `recommendation` | string | Recomendación de acción (español)                 |
+| `timestamp`      | string | Timestamp ISO 8601                                |
 
 ## 🔌 Configuración WebSocket
 

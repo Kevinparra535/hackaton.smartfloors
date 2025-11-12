@@ -174,25 +174,30 @@ const getFloorStatus = (floor) => {
 }
 ```
 
-### Alerts (REST + WebSocket)
-
-```json
-{
-  "alerts": [
-    {
-      "id": "alert_123",
-      "floorId": 3,
-      "floorName": "Piso 3",
-      "type": "temperature",
-      "severity": "warning",
-      "message": "Temperatura elevada detectada",
-      "value": 25.2,
-      "threshold": 24.0,
-      "timestamp": "2025-11-11T23:15:40.991Z"
-    }
-  ]
-}
-```
+### **Alertas Activas:**
+- ✅ Endpoint funcional: `GET /api/v1/alerts`
+- ✅ **Estructura verificada:**
+  ```json
+  {
+    "floorId": 4,
+    "floorName": "Piso 4",
+    "anomalies": [
+      {
+        "type": "humidity",
+        "severity": "critical",
+        "metric": "Humedad",
+        "value": 70,
+        "message": "Humedad muy alta: 70%",
+        "recommendation": "Activar deshumidificadores...",
+        "timestamp": "2025-11-11T22:56:41.009Z"
+      }
+    ],
+    "timestamp": "2025-11-11T22:56:41.009Z",
+    "severity": "critical"
+  }
+  ```
+- ✅ Frontend procesa `anomalies` array correctamente
+- ✅ Cada anomalía se convierte en alerta individual
 
 ---
 
