@@ -13,7 +13,9 @@ export const MainContent = styled.main`
   flex: 1;
   display: flex;
   gap: 20px;
-  padding: 20px;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 `;
 
@@ -21,5 +23,7 @@ export const CanvasWrapper = styled.div`
   flex: 1;
   border-radius: 12px;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 `;

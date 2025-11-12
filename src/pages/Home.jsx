@@ -16,6 +16,7 @@ import {
 } from '../styles/Sidebar.styled';
 
 import { CanvasWrapper, MainContent } from '../styles/AppContainer.styled';
+import { useOutletContext } from 'react-router-dom';
 
 const EmptyInfo = styled.div`
   color: rgba(255, 255, 255, 0.4);
@@ -24,7 +25,9 @@ const EmptyInfo = styled.div`
   font-size: 0.9rem;
 `;
 
-const Home = ({ floorData, isLoading, predictions, alerts }) => {
+const Home = () => {
+  const { floorData, predictions, alerts, isLoading } = useOutletContext();
+
   const [hoveredFloor, setHoveredFloor] = useState(null);
 
   const displayedFloor = !isLoading && (hoveredFloor || floorData[1]);

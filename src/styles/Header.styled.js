@@ -1,13 +1,15 @@
 import styled from 'styled-components';
 
-export const Header = styled.header`
+export const HeaderStyled = styled.header`
   background: rgba(26, 26, 26, 0.95);
   padding: 16px 24px;
   border-bottom: 1px solid rgba(100, 108, 255, 0.2);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 100;
 `;
 
 export const Title = styled.h1`

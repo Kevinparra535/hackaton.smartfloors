@@ -18,6 +18,7 @@
     "framer-motion": "^12.23.24",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.5",
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.19",
     "three": "^0.181.1"
