@@ -150,19 +150,19 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
 
   const handleClose = (e) => {
     e.stopPropagation(); // Prevent event bubbling
-    
+
     if (!cameraControlsRef?.current) {
       console.error('❌ CameraControls not available');
       return;
     }
 
     const controls = cameraControlsRef.current;
-    
-    // Reset camera to default view
+
+    // Reset camera to default view - MUST match BuildingScene DEFAULT_CAMERA_POSITION
     console.log('🔄 Resetting camera from charts');
     controls.setLookAt(
-      10,
-      6,
+      0,
+      0,
       5, // Default camera position
       0,
       0,
@@ -212,27 +212,25 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
           onClick={!isFocused ? handleClick : undefined}
         >
           <Title>SmartFloors Analytics - Piso {selectedFloorId}</Title>
-          
-          {isFocused && (
-            <CloseButton onClick={handleClose}>
-              ✕ Cerrar Gráficas
-            </CloseButton>
-          )}
+
+          {isFocused && <CloseButton onClick={handleClose}>✕ Cerrar Gráficas</CloseButton>}
 
           <ChartsWrapper>
             {isFocused ? (
               <TrendCharts floorId={selectedFloorId} />
             ) : (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-                color: 'rgba(255, 255, 255, 0.6)',
-                fontSize: '18px',
-                textAlign: 'center',
-                padding: '40px'
-              }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontSize: '18px',
+                  textAlign: 'center',
+                  padding: '40px'
+                }}
+              >
                 Haz click para ver los gráficos de tendencia
               </div>
             )}

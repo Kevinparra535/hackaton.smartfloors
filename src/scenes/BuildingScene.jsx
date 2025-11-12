@@ -15,23 +15,26 @@ import FloorInfoPanel from '../components/FloorInfoPanel';
 import { useCameraZoom } from '../hooks/useCameraZoom';
 import { useRef, useState } from 'react';
 import * as THREE from 'three';
+import PredictionsPanel from '../components/PredictionsPanel';
+import FloorPredictionsPanel from '../components/PredictionsPanel';
 
 /**
  * BuildingScene - 3D scene containing all floor blocks with immersive effects
  * @param {Object} props
  * @param {Object} props.floorData - Data for all floors
+ * @param {Object} props.predictions - Predictions data from ML model
  * @param {Function} props.onFloorClick - Callback when a floor is clicked for zoom
  */
-const BuildingScene = ({ floorData, onFloorClick }) => {
+const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
   const cameraControlsRef = useRef();
   const { resetCamera } = useCameraZoom();
   const lastClickedFloor = useRef(null);
   const [selectedFloorId, setSelectedFloorId] = useState(1);
   const [selectedFloorData, setSelectedFloorData] = useState(null);
   const [infoPanelPosition, setInfoPanelPosition] = useState([0, 0, 0]);
+  const [predictionsPanelPosition, setPredictionsPanelPosition] = useState([0, 0, 0]);
 
   const DEFAULT_CAMERA_POSITION = [0, 0, 10];
-  const DEFAULT_CAMERA_TARGET = [0, 0, 0];
 
   const handleClick = (clickData) => {
     if (onFloorClick) {
@@ -39,15 +42,37 @@ const BuildingScene = ({ floorData, onFloorClick }) => {
     }
 
     setSelectedFloorId(clickData.floorId);
-    setSelectedFloorData(clickData.floorData);
+
+    // Combinar datos del piso con sus predicciones
+    const floorPredictions = predictions?.[clickData.floorId] || null;
+    console.log('🔮 [BuildingScene] Predictions for floor', clickData.floorId, ':', floorPredictions);
+    console.log('🔮 [BuildingScene] All predictions:', predictions);
+    
+    const floorDataWithPredictions = {
+      ...clickData.floorData,
+      predictions: floorPredictions
+    };
+
+    console.log('📦 [BuildingScene] Floor data with predictions:', floorDataWithPredictions);
+    setSelectedFloorData(floorDataWithPredictions);
 
     setInfoPanelPosition([-3.5, clickData.floorY, 0]);
+    setPredictionsPanelPosition([3.5, clickData.floorY, 0]); // Right side of floor
 
     if (clickData?.floorY !== undefined && cameraControlsRef.current) {
       const controls = cameraControlsRef.current;
 
       if (lastClickedFloor.current === clickData.floorId) {
-        controls.setLookAt(...DEFAULT_CAMERA_POSITION, ...DEFAULT_CAMERA_TARGET, true);
+        console.log('🔄 Resetting camera to default view');
+        controls.setLookAt(
+          -10,
+          6,
+          5, // DEFAULT_CAMERA_POSITION
+          0,
+          0,
+          0, // DEFAULT_CAMERA_TARGET
+          true
+        );
         lastClickedFloor.current = null;
         setSelectedFloorData(null);
         controls.enabled = true;
@@ -60,10 +85,11 @@ const BuildingScene = ({ floorData, onFloorClick }) => {
         z: 0
       };
 
+      // Position camera closer in front of the floor for better view
       controls.setLookAt(
-        0,
-        clickData.floorY + 0.5,
-        8,
+        0, // x: Centered horizontally with floor
+        clickData.floorY + 0.5, // y: Slightly above floor level for better perspective
+        5, // z: Closer to the floor (reduced from 8 to 5)
         targetPosition.x,
         targetPosition.y,
         targetPosition.z,
@@ -85,7 +111,18 @@ const BuildingScene = ({ floorData, onFloorClick }) => {
     if (cameraControlsRef.current) {
       const controls = cameraControlsRef.current;
 
-      controls.setLookAt(0, 0, 0, 10, 0, 0, true);
+      // Dolly to InteractiveWall position (right side)
+      controls.setLookAt(
+        7, // x: Position to view the wall from left
+        0, // y: Center height
+        0, // z: Aligned with wall
+        15, // Look at wall X position
+        0, // Look at wall Y
+        0, // Look at wall Z
+        true // Smooth transition
+      );
+
+      console.log('📊 Dolly to charts view');
     }
   };
 
@@ -151,12 +188,40 @@ const BuildingScene = ({ floorData, onFloorClick }) => {
               }
 
               if (cameraControlsRef.current) {
-                cameraControlsRef.current.setLookAt(0, 0, 10, 0, 0, 0, true);
+                cameraControlsRef.current.setLookAt(
+                  0,
+                  0,
+                  10, // DEFAULT_CAMERA_POSITION
+                  0,
+                  0,
+                  0, // DEFAULT_CAMERA_TARGET
+                  true
+                );
               }
 
               setSelectedFloorData(null);
               lastClickedFloor.current = null;
             }}
+          />
+        </Html>
+      )}
+
+      {/* Predictions Panel - Right side of floor */}
+      {selectedFloorData && (
+        <Html
+          center
+          sprite
+          occlude={false}
+          transform={false}
+          distanceFactor={6}
+          zIndexRange={[9999, 0]}
+          position={predictionsPanelPosition}
+          style={{ pointerEvents: 'auto' }}
+        >
+          {console.log('🎨 [BuildingScene] Rendering PredictionsPanel at position:', predictionsPanelPosition)}
+          <FloorPredictionsPanel
+            predictions={selectedFloorData.predictions}
+            floorName={selectedFloorData.name}
           />
         </Html>
       )}

@@ -7,9 +7,8 @@ export const Sidebar = styled.aside`
 `;
 
 export const InfoPanel = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  position: relative;
+  pointer-events: auto;
   background: rgba(26, 26, 26, 0.95);
   border-radius: 12px;
   padding: 20px;

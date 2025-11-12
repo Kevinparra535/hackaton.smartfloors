@@ -49,10 +49,15 @@ const getMetricUnit = (metric) => {
  * @param {Object} props.predictions - Predictions data for a floor
  * @param {string} props.floorName - Name of the floor
  */
-export default function PredictionsPanel({ predictions, floorName }) {
+export default function FloorPredictionsPanel({ predictions, floorName }) {
   const [selectedTime, setSelectedTime] = useState(60); // Default to 60 minutes ahead
 
+  console.log('🔮 [PredictionsPanel] Received props:', { predictions, floorName });
+  console.log('🔮 [PredictionsPanel] Predictions is null?', predictions === null);
+  console.log('🔮 [PredictionsPanel] Predictions keys:', predictions ? Object.keys(predictions) : 'N/A');
+
   if (!predictions || Object.keys(predictions).length === 0) {
+    console.log('⚠️ [PredictionsPanel] Showing empty state');
     return (
       <Panel>
         <Title>🔮 Predicciones</Title>

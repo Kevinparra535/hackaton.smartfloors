@@ -1,5 +1,14 @@
 import styled from 'styled-components';
 
+import {
+  InfoPanel,
+  InfoTitle,
+  MetricCard,
+  MetricGrid,
+  MetricLabel,
+  MetricValue
+} from '../styles/Sidebar.styled';
+
 const InfoContainer = styled.div`
   width: 400px;
   background: rgba(10, 10, 10, 0.95);
@@ -15,46 +24,6 @@ const InfoContainer = styled.div`
   &:hover {
     border-color: #00ff88;
   }
-`;
-
-const InfoTitle = styled.h2`
-  margin: 0 0 20px 0;
-  font-size: 20px;
-  color: #646cff;
-  text-align: center;
-  border-bottom: 2px solid rgba(100, 108, 255, 0.3);
-  padding-bottom: 12px;
-`;
-
-const MetricGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-`;
-
-const MetricCard = styled.div`
-  background: rgba(26, 26, 26, 0.8);
-  border: 1px solid rgba(100, 108, 255, 0.2);
-  border-radius: 8px;
-  padding: 12px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: rgba(100, 108, 255, 0.6);
-    transform: translateY(-2px);
-  }
-`;
-
-const MetricLabel = styled.div`
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 6px;
-`;
-
-const MetricValue = styled.div`
-  font-size: 22px;
-  font-weight: bold;
-  color: #00ff88;
 `;
 
 const CloseButton = styled.button`
@@ -112,6 +81,7 @@ const ViewChartsButton = styled.button`
  * @param {Object} props.floorData - Floor data to display
  * @param {Function} props.onClose - Callback when close button is clicked
  * @param {Function} props.onViewCharts - Callback when view charts button is clicked
+ * @param {Function} props.onViewPredictions - Callback when view predictions button is clicked
  */
 export default function FloorInfoPanel({ floorData, onClose, onViewCharts }) {
   if (!floorData) return null;
@@ -127,35 +97,35 @@ export default function FloorInfoPanel({ floorData, onClose, onViewCharts }) {
   };
 
   return (
-    <InfoContainer style={{ pointerEvents: 'auto', position: 'relative' }}>
-      <CloseButton onClick={handleClose}>✕ Cerrar</CloseButton>
+    <InfoPanel>
+      <InfoTitle>
+        {floorData
+          ? `${floorData.name || `Piso ${floorData.floorId}`} - Métricas`
+          : 'Pasa el cursor sobre un piso'}
 
-      <InfoTitle>{floorData.name || `Piso ${floorData.floorId}`} - Métricas</InfoTitle>
+        <CloseButton onClick={handleClose}>✕ Cerrar</CloseButton>
+      </InfoTitle>
 
       <MetricGrid>
         <MetricCard>
           <MetricLabel>🌡️ Temperatura</MetricLabel>
-          <MetricValue>{floorData.temperature?.toFixed(1)}°C</MetricValue>
+          <MetricValue>{floorData.temperature}°C</MetricValue>
         </MetricCard>
-
         <MetricCard>
           <MetricLabel>💧 Humedad</MetricLabel>
-          <MetricValue>{floorData.humidity?.toFixed(1)}%</MetricValue>
+          <MetricValue>{floorData.humidity}%</MetricValue>
         </MetricCard>
-
         <MetricCard>
           <MetricLabel>⚡ Consumo</MetricLabel>
-          <MetricValue>{floorData.powerConsumption?.toFixed(1)} kW</MetricValue>
+          <MetricValue>{floorData.powerConsumption} kW</MetricValue>
         </MetricCard>
-
         <MetricCard>
-          <MetricLabel>👥 Ocupación</MetricLabel>
-          <MetricValue>{floorData.occupancy?.toFixed(0)}%</MetricValue>
+          <MetricLabel>� Ocupación</MetricLabel>
+          <MetricValue>{floorData.occupancy}%</MetricValue>
         </MetricCard>
-
         <MetricCard style={{ gridColumn: 'span 2' }}>
           <MetricLabel>📊 Estado</MetricLabel>
-          <MetricValue style={{ fontSize: '16px', textTransform: 'capitalize' }}>
+          <MetricValue style={{ fontSize: '1rem', textTransform: 'capitalize' }}>
             {floorData.status === 'normal' && '✅ Normal'}
             {floorData.status === 'warning' && '⚠️ Advertencia'}
             {floorData.status === 'danger' && '🚨 Peligro'}
@@ -163,9 +133,7 @@ export default function FloorInfoPanel({ floorData, onClose, onViewCharts }) {
         </MetricCard>
       </MetricGrid>
 
-      <ViewChartsButton onClick={handleViewCharts}>
-        📈 Ver Gráficas de Tendencia
-      </ViewChartsButton>
-    </InfoContainer>
+      <ViewChartsButton onClick={handleViewCharts}>Ver Gráficas de Tendencia</ViewChartsButton>
+    </InfoPanel>
   );
 }

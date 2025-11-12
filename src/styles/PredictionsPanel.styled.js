@@ -3,8 +3,7 @@ import { motion } from 'framer-motion';
 import scssTokens from './scssTokens';
 
 export const Panel = styled.div`
-  position: absolute;
-  left: 10px;
+  position: relative;
   background: ${scssTokens.colors.bg_dark};
   border-radius: 12px;
   padding: 20px;
@@ -30,7 +29,7 @@ export const Panel = styled.div`
 `;
 
 export const Title = styled.h2`
-  color: ${({ theme }) => theme.text.primary};
+  color: ${scssTokens.colors.primary};
   font-size: 1.4rem;
   margin: 0 0 16px 0;
   font-weight: 600;
@@ -136,7 +135,7 @@ export const Trend = styled.span`
 `;
 
 export const EmptyState = styled.div`
-  color: ${({ theme }) => theme.text.dimmed};
+  color: ${scssTokens.colors.variant};
   text-align: center;
   padding: 40px 20px;
   font-size: 0.9rem;
