@@ -3,20 +3,22 @@ import { Html } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import styled from 'styled-components';
+import TrendCharts from './TrendCharts';
 
 const HtmlContainer = styled.div`
-  width: ${(props) => props.$width}px;
-  height: ${(props) => props.$height + 50}px;
-  background: rgba(10, 10, 10, 0.9);
+  width: 100%;
+  height: calc(100% - 0px);
   border: 2px solid #646cff;
   border-radius: 8px;
-  padding: 20px;
   color: white;
   font-family: 'Inter', system-ui, sans-serif;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(100, 108, 255, 0.3);
   pointer-events: auto;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 
   &:hover {
     border-color: #00ff88;
@@ -24,27 +26,31 @@ const HtmlContainer = styled.div`
 `;
 
 const Title = styled.h2`
-  margin: 0 0 16px 0;
+  margin: 0;
+  padding: 16px 20px;
   font-size: 24px;
   color: #646cff;
   text-align: center;
+  border-bottom: 1px solid rgba(100, 108, 255, 0.3);
+  background: rgba(26, 26, 26, 0.5);
+  flex-shrink: 0;
 `;
 
-const Content = styled.div`
-  font-size: 14px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
+const ChartsWrapper = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 `;
 
 /**
  * InteractiveWall - Simple vertical wall plane with HTML overlay
  */
-export default function InteractiveWall({ cameraControlsRef }) {
+export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1 }) {
   const [isFocused, setIsFocused] = useState(false);
   const { size } = useThree(); // Get canvas size instead of window size
   const [dimensions, setDimensions] = useState({
     width: 1200,
-    height: 600,
+    height: 700,
     aspectRatio: size.width / size.height
   });
 
@@ -126,6 +132,16 @@ export default function InteractiveWall({ cameraControlsRef }) {
         position={[0, 0, 1]}
         rotation={[0, -Math.PI / 2, 0]}
         zIndexRange={[100, 0]}
+        center
+        style={{
+          marginTop: '50px',
+          width: `${dimensions.width}px`,
+          height: `${dimensions.height}px`,
+          overflow: 'visible',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start'
+        }}
       >
         <HtmlContainer
           $width={dimensions.width}
@@ -133,18 +149,10 @@ export default function InteractiveWall({ cameraControlsRef }) {
           onClick={handleClick}
           style={{ cursor: 'pointer' }}
         >
-          <Title>SmartFloors Monitor</Title>
-          <Content>
-            <p>
-              <strong>Relación de aspecto:</strong> {dimensions.aspectRatio.toFixed(2)}
-            </p>
-            <p>
-              <strong>Dimensiones:</strong> {dimensions.width}x{dimensions.height}px
-            </p>
-            <p>
-              <strong>Canvas:</strong> {size.width}x{size.height}px
-            </p>
-          </Content>
+          <Title>SmartFloors Analytics - Piso {selectedFloorId}</Title>
+          <ChartsWrapper>
+            <TrendCharts floorId={selectedFloorId} />
+          </ChartsWrapper>
         </HtmlContainer>
       </Html>
     </group>

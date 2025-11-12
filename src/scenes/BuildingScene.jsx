@@ -11,7 +11,7 @@ import FloatingParticles from '../components/FloatingParticles';
 import GradientBackground from '../components/GradientBackground';
 import InteractiveWall from '../components/InteractiveWall';
 import { useCameraZoom } from '../hooks/useCameraZoom';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import * as THREE from 'three';
 
 /**
@@ -25,6 +25,7 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
   const cameraControlsRef = useRef();
   const { resetCamera } = useCameraZoom();
   const lastClickedFloor = useRef(null);
+  const [selectedFloorId, setSelectedFloorId] = useState(1);
 
   const handleHover = (data) => {
     onFloorHover(data);
@@ -33,6 +34,9 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
     if (onFloorClick) {
       onFloorClick(clickData);
     }
+
+    // Update selected floor for charts
+    setSelectedFloorId(clickData.floorId);
 
     // Dolly camera to the clicked floor using CameraControls
     if (clickData?.floorY !== undefined && cameraControlsRef.current) {
@@ -88,7 +92,7 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
   return (
     <>
       {/* Camera setup with better positioning */}
-      <PerspectiveCamera makeDefault position={[10, 6, 5]} fov={55} />
+      <PerspectiveCamera makeDefault position={[-5, 1, 10]} fov={55} />
 
       {/* Fog for depth and atmosphere */}
       <fog attach='fog' args={['#0a0a0a', 5, 30]} />
@@ -119,7 +123,7 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
       <FloatingParticles count={150} />
 
       {/* Interactive wall - Right side with integrated 3D HTML */}
-      <InteractiveWall cameraControlsRef={cameraControlsRef} />
+      <InteractiveWall cameraControlsRef={cameraControlsRef} selectedFloorId={selectedFloorId} />
 
       {/* Environment for reflections */}
       <Environment preset='city' background={false} />
