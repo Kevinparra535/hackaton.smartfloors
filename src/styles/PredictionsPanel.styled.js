@@ -55,10 +55,9 @@ export const TimeSelector = styled.div`
 export const TimeButton = styled.button`
   padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid
-    ${({ $active, theme }) => ($active ? theme.colors.primary : theme.border.default)};
-  background: ${({ $active, theme }) =>
-    $active ? theme.colors.primaryLight : 'rgba(100, 108, 255, 0.1)'};
+  border: 1px solid ${scssTokens.colors.primary};
+  background: ${({ $active }) =>
+    $active ? scssTokens.colors.primary : 'rgba(100, 108, 255, 0.1)'};
   color: ${({ $active, theme }) => ($active ? theme.text.primary : theme.text.secondary)};
   font-size: 0.85rem;
   cursor: pointer;

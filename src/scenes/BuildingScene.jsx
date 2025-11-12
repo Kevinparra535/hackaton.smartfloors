@@ -1,172 +1,240 @@
-import {
-  Environment,
-  PerspectiveCamera,
-  Stars,
-  SpotLight,
-  CameraControls,
-  Html
-} from '@react-three/drei';
+import { useRef, useState } from 'react';
+import { Environment, PerspectiveCamera, Stars, CameraControls, Html } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+
 import FloorBlock from '../components/FloorBlock';
 import FloatingParticles from '../components/FloatingParticles';
 import GradientBackground from '../components/GradientBackground';
 import InteractiveWall from '../components/InteractiveWall';
 import FloorInfoPanel from '../components/FloorInfoPanel';
-import { useCameraZoom } from '../hooks/useCameraZoom';
-import { useRef, useState } from 'react';
-import * as THREE from 'three';
-import PredictionsPanel from '../components/PredictionsPanel';
 import FloorPredictionsPanel from '../components/PredictionsPanel';
 
+import { useCameraZoom } from '../hooks/useCameraZoom';
+
+const CAMERA_CONFIG = {
+  DEFAULT_POSITION: [0, 0, 10],
+  DEFAULT_TARGET: [0, 0, 0],
+  RESET_POSITION: [-10, 6, 5],
+  FOV: 55,
+  MIN_DISTANCE: 0.5,
+  MAX_DISTANCE: 100,
+  SMOOTH_TIME: 0.25,
+  LOCK_DELAY: 300
+};
+
+const FLOOR_CONFIG = {
+  SPACING: 1.5,
+  CENTER_OFFSET: 3,
+  INFO_PANEL_OFFSET: -3.5,
+  PREDICTIONS_PANEL_OFFSET: 3.5
+};
+
+const LIGHTING_CONFIG = {
+  ambient: { intensity: 0.3 },
+  directional: {
+    position: [10, 15, 5],
+    intensity: 1.5,
+    shadowMapSize: 2048
+  },
+  point1: { position: [-10, 10, -5], intensity: 0.8, color: '#646cff' },
+  point2: { position: [10, 5, 10], intensity: 0.5, color: '#00ff88' },
+  spot: {
+    position: [0, 20, 0],
+    angle: 0.6,
+    penumbra: 1,
+    intensity: 0.5,
+    color: '#ffffff'
+  }
+};
+
+const GROUND_CONFIG = {
+  position: [0, -6, 0],
+  size: [30, 30],
+  color: '#0d0d0d',
+  metalness: 0.4,
+  roughness: 0.6
+};
+
+const PLACEHOLDER_FLOORS = [1, 2, 3];
+
 /**
- * BuildingScene - 3D scene containing all floor blocks with immersive effects
+ * Calculate vertical position for a floor based on its number
+ * @param {number} floorNumber - Floor number (1-5)
+ * @returns {number} Y position in 3D space
+ */
+const getFloorPosition = (floorNumber) => {
+  return (floorNumber - FLOOR_CONFIG.CENTER_OFFSET) * FLOOR_CONFIG.SPACING;
+};
+
+/**
+ * Create placeholder floor data for loading state
+ * @param {number} floorId - Floor ID
+ * @returns {Object} Floor data object
+ */
+const createPlaceholderFloor = (floorId) => ({
+  floorId,
+  name: `Piso ${floorId}`,
+  temperature: 0,
+  humidity: 0,
+  powerConsumption: 0,
+  occupancy: 0,
+  status: 'normal'
+});
+
+/**
+ * BuildingScene - Main 3D scene containing all floor blocks with immersive effects
+ * Manages camera controls, floor selection, and interactive panels
+ *
  * @param {Object} props
- * @param {Object} props.floorData - Data for all floors
- * @param {Object} props.predictions - Predictions data from ML model
- * @param {Function} props.onFloorClick - Callback when a floor is clicked for zoom
+ * @param {Object} props.floorData - Real-time data for all floors (keyed by floorId)
+ * @param {Object} props.predictions - ML predictions for all floors (keyed by floorId)
+ * @param {Function} props.onFloorClick - Callback when a floor is clicked
  */
 const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
   const cameraControlsRef = useRef();
-  const { resetCamera } = useCameraZoom();
   const lastClickedFloor = useRef(null);
-  const [selectedFloorId, setSelectedFloorId] = useState(1);
+  const { resetCamera } = useCameraZoom();
+
   const [selectedFloorData, setSelectedFloorData] = useState(null);
   const [infoPanelPosition, setInfoPanelPosition] = useState([0, 0, 0]);
   const [predictionsPanelPosition, setPredictionsPanelPosition] = useState([0, 0, 0]);
 
-  const DEFAULT_CAMERA_POSITION = [0, 0, 10];
+  /**
+   * Handle floor click - zoom camera and show panels
+   * Double-click on same floor resets view
+   */
+  const handleFloorClick = (clickData) => {
+    const { floorId, floorData: clickedFloorData, floorY } = clickData;
 
-  const handleClick = (clickData) => {
     if (onFloorClick) {
       onFloorClick(clickData);
     }
 
-    setSelectedFloorId(clickData.floorId);
+    if (lastClickedFloor.current === floorId) {
+      handleResetView();
+      return;
+    }
 
-    // Combinar datos del piso con sus predicciones
-    const floorPredictions = predictions?.[clickData.floorId] || null;
-    console.log('🔮 [BuildingScene] Predictions for floor', clickData.floorId, ':', floorPredictions);
-    console.log('🔮 [BuildingScene] All predictions:', predictions);
-    
-    const floorDataWithPredictions = {
-      ...clickData.floorData,
+    const floorPredictions = predictions?.[floorId] || null;
+    const enrichedFloorData = {
+      ...clickedFloorData,
       predictions: floorPredictions
     };
 
-    console.log('📦 [BuildingScene] Floor data with predictions:', floorDataWithPredictions);
-    setSelectedFloorData(floorDataWithPredictions);
+    setSelectedFloorData(enrichedFloorData);
+    setInfoPanelPosition([FLOOR_CONFIG.INFO_PANEL_OFFSET, floorY, 0]);
+    setPredictionsPanelPosition([FLOOR_CONFIG.PREDICTIONS_PANEL_OFFSET, floorY, 0]);
 
-    setInfoPanelPosition([-3.5, clickData.floorY, 0]);
-    setPredictionsPanelPosition([3.5, clickData.floorY, 0]); // Right side of floor
-
-    if (clickData?.floorY !== undefined && cameraControlsRef.current) {
+    if (floorY !== undefined && cameraControlsRef.current) {
       const controls = cameraControlsRef.current;
 
-      if (lastClickedFloor.current === clickData.floorId) {
-        console.log('🔄 Resetting camera to default view');
-        controls.setLookAt(
-          -10,
-          6,
-          5, // DEFAULT_CAMERA_POSITION
-          0,
-          0,
-          0, // DEFAULT_CAMERA_TARGET
-          true
-        );
-        lastClickedFloor.current = null;
-        setSelectedFloorData(null);
-        controls.enabled = true;
-        return;
-      }
-
-      const targetPosition = {
-        x: 0,
-        y: clickData.floorY,
-        z: 0
-      };
-
-      // Position camera closer in front of the floor for better view
-      controls.setLookAt(
-        0, // x: Centered horizontally with floor
-        clickData.floorY + 0.5, // y: Slightly above floor level for better perspective
-        5, // z: Closer to the floor (reduced from 8 to 5)
-        targetPosition.x,
-        targetPosition.y,
-        targetPosition.z,
-        true
-      );
+      controls.setLookAt(0, floorY + 0.5, 5, 0, floorY, 0, true);
 
       setTimeout(() => {
         if (controls) {
           controls.enabled = false;
-          console.log('🔒 Camera controls locked');
         }
-      }, 300);
+      }, CAMERA_CONFIG.LOCK_DELAY);
 
-      lastClickedFloor.current = clickData.floorId;
+      lastClickedFloor.current = floorId;
     }
   };
 
+  /**
+   * Reset camera to default view and clear selection
+   */
+  const handleResetView = () => {
+    if (!cameraControlsRef.current) return;
+
+    const controls = cameraControlsRef.current;
+
+    controls.setLookAt(...CAMERA_CONFIG.RESET_POSITION, ...CAMERA_CONFIG.DEFAULT_TARGET, true);
+
+    controls.enabled = true;
+    setSelectedFloorData(null);
+    lastClickedFloor.current = null;
+  };
+
+  /**
+   * Close info panel and reset view
+   */
+  const handleClosePanel = () => {
+    if (!cameraControlsRef.current) return;
+
+    const controls = cameraControlsRef.current;
+
+    controls.enabled = true;
+    controls.setLookAt(...CAMERA_CONFIG.DEFAULT_POSITION, ...CAMERA_CONFIG.DEFAULT_TARGET, true);
+
+    setSelectedFloorData(null);
+    lastClickedFloor.current = null;
+  };
+
+  /**
+   * Navigate camera to view charts on interactive wall
+   */
   const handleViewCharts = () => {
-    if (cameraControlsRef.current) {
-      const controls = cameraControlsRef.current;
+    if (!cameraControlsRef.current) return;
 
-      // Dolly to InteractiveWall position (right side)
-      controls.setLookAt(
-        7, // x: Position to view the wall from left
-        0, // y: Center height
-        0, // z: Aligned with wall
-        15, // Look at wall X position
-        0, // Look at wall Y
-        0, // Look at wall Z
-        true // Smooth transition
-      );
-
-      console.log('📊 Dolly to charts view');
-    }
-  };
-
-  const getFloorPosition = (floorNumber) => {
-    return (floorNumber - 3) * 1.5;
+    cameraControlsRef.current.setLookAt(7, 0, 0, 15, 0, 0, true);
   };
 
   return (
     <>
-      {/* Camera setup with better positioning */}
-      <PerspectiveCamera makeDefault position={DEFAULT_CAMERA_POSITION} fov={55} />
+      {/* Camera & Fog */}
 
-      {/* Fog for depth and atmosphere */}
+      <PerspectiveCamera
+        makeDefault
+        position={CAMERA_CONFIG.DEFAULT_POSITION}
+        fov={CAMERA_CONFIG.FOV}
+      />
       <fog attach='fog' args={['#0a0a0a', 5, 30]} />
 
-      {/* Enhanced Lighting Setup */}
-      <ambientLight intensity={0.3} />
+      {/* Lighting */}
+
+      <ambientLight intensity={LIGHTING_CONFIG.ambient.intensity} />
       <directionalLight
-        position={[10, 15, 5]}
-        intensity={1.5}
+        position={LIGHTING_CONFIG.directional.position}
+        intensity={LIGHTING_CONFIG.directional.intensity}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={LIGHTING_CONFIG.directional.shadowMapSize}
+        shadow-mapSize-height={LIGHTING_CONFIG.directional.shadowMapSize}
       />
-      <pointLight position={[-10, 10, -5]} intensity={0.8} color='#646cff' />
-      <pointLight position={[10, 5, 10]} intensity={0.5} color='#00ff88' />
+      <pointLight
+        position={LIGHTING_CONFIG.point1.position}
+        intensity={LIGHTING_CONFIG.point1.intensity}
+        color={LIGHTING_CONFIG.point1.color}
+      />
+      <pointLight
+        position={LIGHTING_CONFIG.point2.position}
+        intensity={LIGHTING_CONFIG.point2.intensity}
+        color={LIGHTING_CONFIG.point2.color}
+      />
       <spotLight
-        position={[0, 20, 0]}
-        angle={0.6}
-        penumbra={1}
-        intensity={0.5}
+        position={LIGHTING_CONFIG.spot.position}
+        angle={LIGHTING_CONFIG.spot.angle}
+        penumbra={LIGHTING_CONFIG.spot.penumbra}
+        intensity={LIGHTING_CONFIG.spot.intensity}
+        color={LIGHTING_CONFIG.spot.color}
         castShadow
-        color='#ffffff'
       />
 
-      {/* Immersive Background Elements */}
+      {/* Immersive Background */}
+
       <GradientBackground />
       <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
       <FloatingParticles count={150} />
+      <Environment preset='city' background={false} />
 
-      {/* Interactive wall - Right side with integrated 3D HTML */}
-      <InteractiveWall cameraControlsRef={cameraControlsRef} selectedFloorId={selectedFloorId} />
+      {/* Interactive Elements */}
 
-      {/* Floor Info Panel - Shows when a floor is clicked */}
+      <InteractiveWall
+        cameraControlsRef={cameraControlsRef}
+        selectedFloorId={selectedFloorData?.floorId || null}
+      />
+
+      {/* Floor Info Panel (Left) */}
+
       {selectedFloorData && (
         <Html
           center
@@ -181,32 +249,13 @@ const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
           <FloorInfoPanel
             floorData={selectedFloorData}
             onViewCharts={handleViewCharts}
-            onClose={() => {
-              if (cameraControlsRef.current) {
-                cameraControlsRef.current.enabled = true;
-                console.log('🔓 Camera controls unlocked');
-              }
-
-              if (cameraControlsRef.current) {
-                cameraControlsRef.current.setLookAt(
-                  0,
-                  0,
-                  10, // DEFAULT_CAMERA_POSITION
-                  0,
-                  0,
-                  0, // DEFAULT_CAMERA_TARGET
-                  true
-                );
-              }
-
-              setSelectedFloorData(null);
-              lastClickedFloor.current = null;
-            }}
+            onClose={handleClosePanel}
           />
         </Html>
       )}
 
-      {/* Predictions Panel - Right side of floor */}
+      {/* Predictions Panel (Right) */}
+
       {selectedFloorData && (
         <Html
           center
@@ -218,7 +267,6 @@ const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
           position={predictionsPanelPosition}
           style={{ pointerEvents: 'auto' }}
         >
-          {console.log('🎨 [BuildingScene] Rendering PredictionsPanel at position:', predictionsPanelPosition)}
           <FloorPredictionsPanel
             predictions={selectedFloorData.predictions}
             floorName={selectedFloorData.name}
@@ -226,67 +274,59 @@ const BuildingScene = ({ floorData, predictions, onFloorClick }) => {
         </Html>
       )}
 
-      {/* Environment for reflections */}
-      <Environment preset='city' background={false} />
+      {/* Floor Blocks */}
 
-      {/* Floor blocks - 5 floors */}
       {floorData && Object.keys(floorData).length > 0
         ? Object.values(floorData).map((floor) => (
             <FloorBlock
               key={floor.floorId}
               data={floor}
               position={getFloorPosition(floor.floorId)}
-              onClick={handleClick}
+              onClick={handleFloorClick}
             />
           ))
-        : [1, 2, 3].map((floorId) => (
+        : PLACEHOLDER_FLOORS.map((floorId) => (
             <FloorBlock
               key={`placeholder-${floorId}`}
-              data={{
-                floorId,
-                name: `Piso ${floorId}`,
-                temperature: 0,
-                humidity: 0,
-                powerConsumption: 0,
-                occupancy: 0,
-                status: 'normal'
-              }}
+              data={createPlaceholderFloor(floorId)}
               position={getFloorPosition(floorId)}
-              onClick={handleClick}
+              onClick={handleFloorClick}
             />
           ))}
 
-      {/* Ground plane with enhanced materials */}
+      {/* Ground Plane */}
+
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -6, 0]}
+        position={GROUND_CONFIG.position}
         receiveShadow
         onDoubleClick={resetCamera}
       >
-        <planeGeometry args={[30, 30]} />
+        <planeGeometry args={GROUND_CONFIG.size} />
         <meshStandardMaterial
-          color='#0d0d0d'
-          metalness={0.4}
-          roughness={0.6}
+          color={GROUND_CONFIG.color}
+          metalness={GROUND_CONFIG.metalness}
+          roughness={GROUND_CONFIG.roughness}
           envMapIntensity={0.5}
         />
       </mesh>
 
-      {/* Post-processing effects for immersion */}
+      {/* Post-Processing Effects */}
+
       <EffectComposer>
         <Bloom intensity={0.5} luminanceThreshold={0.2} luminanceSmoothing={0.9} mipmapBlur />
-        {/* <DepthOfField focusDistance={0.1} focalLength={0.05} bokehScale={3} /> */}
         <Vignette eskil={false} offset={0.1} darkness={0.5} />
       </EffectComposer>
 
-      {/* Controls */}
+      {/* Camera Controls */}
+
       <CameraControls
         ref={cameraControlsRef}
         makeDefault
-        minDistance={0.5}
-        maxDistance={100}
-        smoothTime={0.25}
-        draggingSmoothTime={0.25}
+        minDistance={CAMERA_CONFIG.MIN_DISTANCE}
+        maxDistance={CAMERA_CONFIG.MAX_DISTANCE}
+        smoothTime={CAMERA_CONFIG.SMOOTH_TIME}
+        draggingSmoothTime={CAMERA_CONFIG.SMOOTH_TIME}
         maxPolarAngle={Math.PI / 2}
       />
     </>
