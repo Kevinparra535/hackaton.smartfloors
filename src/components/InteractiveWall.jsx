@@ -163,7 +163,7 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
     controls.setLookAt(
       0,
       0,
-      5, // Default camera position
+      10, // Default camera position
       0,
       0,
       0, // Look at center
@@ -191,7 +191,7 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
         transform
         occlude='blending'
         distanceFactor={2.5}
-        position={[0, 0, 1]}
+        position={[0, 0, 0.1]}
         rotation={[0, -Math.PI / 2, 0]}
         zIndexRange={[100, 0]}
         center

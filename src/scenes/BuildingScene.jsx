@@ -100,10 +100,9 @@ const BuildingScene = ({ floorData, predictions, alerts = [], onFloorClick }) =>
   const [selectedFloorData, setSelectedFloorData] = useState(null);
   const [infoPanelPosition, setInfoPanelPosition] = useState([0, 0, 0]);
   const [predictionsPanelPosition, setPredictionsPanelPosition] = useState([0, 0, 0]);
+  const [shouldFocusAlerts, setShouldFocusAlerts] = useState(false);
 
-  // ============================================================================
   // Effects
-  // ============================================================================
 
   /**
    * Update selected floor data when floorData or predictions change
@@ -132,9 +131,7 @@ const BuildingScene = ({ floorData, predictions, alerts = [], onFloorClick }) =>
     }
   }, [floorData, predictions, selectedFloorData]);
 
-  // ============================================================================
   // Event Handlers
-  // ============================================================================
 
   /**
    * Handle floor click - zoom camera and show panels
@@ -216,6 +213,20 @@ const BuildingScene = ({ floorData, predictions, alerts = [], onFloorClick }) =>
     cameraControlsRef.current.setLookAt(7, 0, 0, 15, 0, 0, true);
   };
 
+  /**
+   * Navigate camera to view alerts table on left wall
+   */
+  const handleViewAlerts = () => {
+    setShouldFocusAlerts(true);
+  };
+
+  /**
+   * Reset alerts focus trigger after animation completes
+   */
+  const handleAlertsFocusComplete = () => {
+    setShouldFocusAlerts(false);
+  };
+
   return (
     <>
       {/* Camera & Fog */}
@@ -270,7 +281,12 @@ const BuildingScene = ({ floorData, predictions, alerts = [], onFloorClick }) =>
         selectedFloorId={selectedFloorData?.floorId || null}
       />
 
-      <InteractiveWallLeft cameraControlsRef={cameraControlsRef} alerts={alerts} />
+      <InteractiveWallLeft
+        cameraControlsRef={cameraControlsRef}
+        alerts={alerts}
+        shouldFocus={shouldFocusAlerts}
+        onFocusComplete={handleAlertsFocusComplete}
+      />
 
       {/* Floor Info Panel (Left) */}
 
@@ -288,6 +304,7 @@ const BuildingScene = ({ floorData, predictions, alerts = [], onFloorClick }) =>
           <FloorInfoPanel
             floorData={selectedFloorData}
             onViewCharts={handleViewCharts}
+            onViewAlerts={handleViewAlerts}
             onClose={handleClosePanel}
           />
         </Html>

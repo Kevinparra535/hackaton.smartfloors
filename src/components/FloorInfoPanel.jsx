@@ -75,15 +75,45 @@ const ViewChartsButton = styled.button`
   }
 `;
 
+const ViewAlertsButton = styled.button`
+  width: 100%;
+  margin-top: 12px;
+  background: rgba(255, 77, 79, 0.2);
+  border: 2px solid #ff4d4f;
+  border-radius: 8px;
+  color: #ff4d4f;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background: rgba(255, 77, 79, 0.4);
+    border-color: #ffd966;
+    color: #ffd966;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 /**
  * FloorInfoPanel - 3D HTML panel displaying floor metrics
  * @param {Object} props
  * @param {Object} props.floorData - Floor data to display
  * @param {Function} props.onClose - Callback when close button is clicked
  * @param {Function} props.onViewCharts - Callback when view charts button is clicked
- * @param {Function} props.onViewPredictions - Callback when view predictions button is clicked
+ * @param {Function} props.onViewAlerts - Callback when view alerts button is clicked
  */
-export default function FloorInfoPanel({ floorData, onClose, onViewCharts }) {
+export default function FloorInfoPanel({ floorData, onClose, onViewCharts, onViewAlerts }) {
   if (!floorData) return null;
 
   const handleClose = (e) => {
@@ -94,6 +124,11 @@ export default function FloorInfoPanel({ floorData, onClose, onViewCharts }) {
   const handleViewCharts = (e) => {
     e.stopPropagation();
     if (onViewCharts) onViewCharts();
+  };
+
+  const handleViewAlerts = (e) => {
+    e.stopPropagation();
+    if (onViewAlerts) onViewAlerts();
   };
 
   return (
@@ -133,7 +168,8 @@ export default function FloorInfoPanel({ floorData, onClose, onViewCharts }) {
         </MetricCard>
       </MetricGrid>
 
-      <ViewChartsButton onClick={handleViewCharts}>Ver Gráficas de Tendencia</ViewChartsButton>
+      <ViewChartsButton onClick={handleViewCharts}>📈 Ver Gráficas de Tendencia</ViewChartsButton>
+      <ViewAlertsButton onClick={handleViewAlerts}>⚠️ Ver Tabla de Alertas</ViewAlertsButton>
     </InfoPanel>
   );
 }

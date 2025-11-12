@@ -21,6 +21,18 @@ const HtmlContainer = styled.div`
   flex-direction: column;
   background: rgba(26, 26, 26, 0.95);
 
+  /* Text clarity improvements */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern' 1;
+  font-kerning: normal;
+
+  /* Prevent blurring on transform */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+
   &:hover {
     border-color: #00ff88;
   }
@@ -35,6 +47,10 @@ const Title = styled.h2`
   border-bottom: 1px solid rgba(255, 77, 79, 0.3);
   background: rgba(26, 26, 26, 0.5);
   flex-shrink: 0;
+
+  /* Text clarity */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 `;
 
 const ContentWrapper = styled.div`
@@ -77,8 +93,18 @@ const CloseButton = styled.button`
 /**
  * InteractiveWallLeft - Left side wall with Alerts Table
  * Positioned at x = -15 (opposite side of the main wall)
+ * @param {Object} props
+ * @param {Object} props.cameraControlsRef - Reference to camera controls
+ * @param {Array} props.alerts - Array of alerts to display
+ * @param {boolean} props.shouldFocus - External trigger to focus the alerts table
+ * @param {Function} props.onFocusComplete - Callback when focus animation completes
  */
-export default function InteractiveWallLeft({ cameraControlsRef, alerts = [] }) {
+export default function InteractiveWallLeft({
+  cameraControlsRef,
+  alerts = [],
+  shouldFocus = false,
+  onFocusComplete
+}) {
   const [isFocused, setIsFocused] = useState(false);
   const { size } = useThree();
   const [dimensions, setDimensions] = useState({
@@ -103,6 +129,16 @@ export default function InteractiveWallLeft({ cameraControlsRef, alerts = [] }) 
 
     updateDimensions();
   }, [size.width, size.height]);
+
+  // Handle external focus trigger (from FloorInfoPanel button)
+  useEffect(() => {
+    if (shouldFocus && !isFocused) {
+      handleClick();
+      if (onFocusComplete) {
+        onFocusComplete();
+      }
+    }
+  }, [shouldFocus]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Disable camera controls when table is focused
   useEffect(() => {
@@ -165,7 +201,7 @@ export default function InteractiveWallLeft({ cameraControlsRef, alerts = [] }) 
     controls.setLookAt(
       0,
       0,
-      5, // Default camera position
+      10, // Default camera position
       0,
       0,
       0, // Look at center
@@ -191,12 +227,15 @@ export default function InteractiveWallLeft({ cameraControlsRef, alerts = [] }) 
       {/* HTML Content integrated in 3D space */}
       <Html
         transform
-        occlude='blending'
+        occlude={false}
         distanceFactor={2.5}
-        position={[0, 0, -1]}
+        position={[0, 0, -0.5]}
         rotation={[0, Math.PI / 2, 0]}
         zIndexRange={[100, 0]}
         center
+        calculatePosition={(el, camera, size) => {
+          return [size.width / 2, size.height / 2];
+        }}
         style={{
           marginTop: '50px',
           width: `${dimensions.width}px`,
@@ -204,7 +243,12 @@ export default function InteractiveWallLeft({ cameraControlsRef, alerts = [] }) 
           overflow: 'visible',
           display: 'flex',
           justifyContent: 'flex-start',
-          alignItems: 'flex-start'
+          alignItems: 'flex-start',
+          // Anti-aliasing and quality improvements
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
+          textRendering: 'optimizeLegibility',
+          imageRendering: 'crisp-edges'
         }}
       >
         <HtmlContainer
