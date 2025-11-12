@@ -16,7 +16,7 @@ WebSocket: Conecta a http://localhost:3000
     ↓
 Escucha eventos en tiempo real:
   - floorData (actualización de métricas)
-  - alert (nuevas alertas)
+  - new-alerts (nuevas alertas) ⚠️ Note: event name is 'new-alerts', not 'alert'
   - predictions (nuevas predicciones ML)
 ```
 
@@ -266,8 +266,9 @@ socket.on('floorData', (data) => {
   // Procesar { floors: [...], timestamp: "..." }
 });
 
-socket.on('alert', (alert) => {
-  // Procesar alerta individual
+socket.on('new-alerts', (alert) => {
+  // ⚠️ Important: Event name is 'new-alerts', not 'alert'
+  // Procesar alerta individual o batch con {alerts: [...]}
 });
 ```
 

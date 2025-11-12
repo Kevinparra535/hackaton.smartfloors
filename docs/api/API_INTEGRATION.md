@@ -10,8 +10,10 @@ http://localhost:3000
 
 ### WebSocket (Socket.IO) - Tiempo Real
 - **Propósito**: Actualizaciones en vivo de datos de pisos, alertas y predicciones
-- **Eventos**: `floorData`, `alert`, `predictions`
+- **Eventos**: `floorData`, `new-alerts`, `predictions`
 - **Puerto**: 3000
+
+> ⚠️ **Important:** The alert event is named `new-alerts`, not `alert`
 
 ### REST API - Consultas On-Demand
 - **Propósito**: Consultas históricas, estadísticas, predicciones específicas

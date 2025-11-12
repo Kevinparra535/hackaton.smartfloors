@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import * as THREE from 'three';
 
 const STATUS_COLORS = {
   normal: '#00ff88',
@@ -50,7 +49,7 @@ export default function FloorBlock({ data, position, onHover }) {
     <group position={[0, position, 0]}>
       {/* Floor block */}
       <mesh ref={meshRef} onPointerOver={() => onHover(data)} onPointerOut={() => onHover(null)}>
-        <boxGeometry args={[3, 0.8, 3]} />
+        <boxGeometry args={[3, 1, 3]} />
         <meshStandardMaterial
           ref={materialRef}
           color={color}
