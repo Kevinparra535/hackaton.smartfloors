@@ -15,11 +15,8 @@ const BuildingScene = ({ floorData, onFloorHover }) => {
   // Calculate Y positions for floors (stacked vertically)
   const getFloorPosition = (floorNumber) => {
     // Center the building vertically (5 floors)
-    return (floorNumber - 3); // Space floors 1.2 units apart
+    return floorNumber - 3; // Space floors 1.2 units apart
   };
-
-  // Debug: Log floorData to see what we're receiving
-  console.log('🏢 [BuildingScene] Rendering with floorData:', floorData);
 
   return (
     <>
@@ -35,34 +32,32 @@ const BuildingScene = ({ floorData, onFloorHover }) => {
       <Environment preset='city' />
 
       {/* Floor blocks - 5 floors */}
-      {floorData && Object.keys(floorData).length > 0 ? (
-        Object.values(floorData).map((floor) => (
-          <FloorBlock
-            key={floor.floorId}
-            data={floor}
-            position={getFloorPosition(floor.floorId)}
-            onHover={handleHover}
-          />
-        ))
-      ) : (
-        // Show placeholder blocks while data is loading
-        [1, 2, 3, 4, 5].map((floorId) => (
-          <FloorBlock
-            key={`placeholder-${floorId}`}
-            data={{
-              floorId,
-              name: `Piso ${floorId}`,
-              temperature: 0,
-              humidity: 0,
-              powerConsumption: 0,
-              occupancy: 0,
-              status: 'normal'
-            }}
-            position={getFloorPosition(floorId)}
-            onHover={handleHover}
-          />
-        ))
-      )}
+      {floorData && Object.keys(floorData).length > 0
+        ? Object.values(floorData).map((floor) => (
+            <FloorBlock
+              key={floor.floorId}
+              data={floor}
+              position={getFloorPosition(floor.floorId)}
+              onHover={handleHover}
+            />
+          ))
+        : // Show placeholder blocks while data is loading
+          [1, 2, 3, 4, 5].map((floorId) => (
+            <FloorBlock
+              key={`placeholder-${floorId}`}
+              data={{
+                floorId,
+                name: `Piso ${floorId}`,
+                temperature: 0,
+                humidity: 0,
+                powerConsumption: 0,
+                occupancy: 0,
+                status: 'normal'
+              }}
+              position={getFloorPosition(floorId)}
+              onHover={handleHover}
+            />
+          ))}
 
       {/* Ground plane */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.5, 0]} receiveShadow>

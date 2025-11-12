@@ -39,9 +39,8 @@ const apiFetch = async (endpoint, options = {}) => {
  * @returns {Promise<Array>} Array of floor objects
  */
 export const fetchAllFloors = async () => {
-  console.log('📡 [REST API] Fetching all floors...');
   const response = await apiFetch('/floors');
-  console.log('✅ [REST API] Floors loaded:', response.data.length);
+
   return response.data;
 };
 
@@ -51,9 +50,8 @@ export const fetchAllFloors = async () => {
  * @returns {Promise<object>} Floor object
  */
 export const fetchFloorById = async (floorId) => {
-  console.log(`📡 [REST API] Fetching floor ${floorId}...`);
   const response = await apiFetch(`/floors/${floorId}`);
-  console.log(`✅ [REST API] Floor ${floorId} loaded`);
+
   return response.data;
 };
 
@@ -62,9 +60,8 @@ export const fetchFloorById = async (floorId) => {
  * @returns {Promise<object>} Statistics object
  */
 export const fetchFloorStats = async () => {
-  console.log('📡 [REST API] Fetching floor statistics...');
   const response = await apiFetch('/floors/stats');
-  console.log('✅ [REST API] Statistics loaded');
+
   return response.data;
 };
 
@@ -75,9 +72,8 @@ export const fetchFloorStats = async () => {
  * @returns {Promise<Array>} Array of historical records
  */
 export const fetchFloorHistory = async (floorId, limit = 60) => {
-  console.log(`📡 [REST API] Fetching history for floor ${floorId} (limit: ${limit})...`);
   const response = await apiFetch(`/floors/${floorId}/history?limit=${limit}`);
-  console.log(`✅ [REST API] History loaded: ${response.data.history.length} records`);
+
   return response.data;
 };
 
@@ -88,9 +84,8 @@ export const fetchFloorHistory = async (floorId, limit = 60) => {
  * @returns {Promise<object>} Predictions object
  */
 export const fetchFloorPredictions = async (floorId, minutesAhead = 60) => {
-  console.log(`📡 [REST API] Fetching predictions for floor ${floorId} (${minutesAhead} min)...`);
   const response = await apiFetch(`/floors/${floorId}/predictions?minutesAhead=${minutesAhead}`);
-  console.log(`✅ [REST API] Predictions loaded for floor ${floorId}`);
+
   return response.data;
 };
 
@@ -99,9 +94,8 @@ export const fetchFloorPredictions = async (floorId, minutesAhead = 60) => {
  * @returns {Promise<Array>} Array of alert objects
  */
 export const fetchAlerts = async () => {
-  console.log('📡 [REST API] Fetching alerts...');
   const response = await apiFetch('/alerts');
-  console.log(`✅ [REST API] Alerts loaded: ${response.data.alerts.length} active`);
+
   return response.data.alerts;
 };
 
@@ -110,10 +104,9 @@ export const fetchAlerts = async () => {
  * @returns {Promise<object>} Health status object
  */
 export const checkHealth = async () => {
-  console.log('📡 [REST API] Checking server health...');
   const response = await fetch('http://localhost:3000/health');
   const data = await response.json();
-  console.log('✅ [REST API] Server status:', data.status);
+
   return data;
 };
 

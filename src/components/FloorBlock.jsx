@@ -22,12 +22,8 @@ export default function FloorBlock({ data, position, onHover }) {
 
   const color = STATUS_COLORS[data.status] || STATUS_COLORS.normal;
 
-  // Debug: Log when floor data changes
-  console.log(`🏗️ [FloorBlock ${data.floorId}] Rendered with status: ${data.status}, color: ${color}`, data);
-
   // Monitor color changes for debugging
   useEffect(() => {
-    console.log(`🎨 [FloorBlock ${data.floorId}] Color updated to: ${color}`);
     if (materialRef.current) {
       materialRef.current.color.set(color);
       materialRef.current.emissive.set(color);

@@ -15,12 +15,10 @@ import { fetchAllFloors, fetchAlerts } from '../api/rest';
 const getFloorStatus = (floor) => {
   const { temperature, humidity, powerConsumption } = floor;
 
-  // Danger conditions
   if (temperature > 26 || temperature < 18) return 'danger';
   if (humidity > 70 || humidity < 30) return 'danger';
   if (powerConsumption > 150) return 'danger';
 
-  // Warning conditions
   if (temperature > 24 || temperature < 20) return 'warning';
   if (humidity > 60 || humidity < 35) return 'warning';
   if (powerConsumption > 135) return 'warning';
@@ -39,11 +37,7 @@ export const useRealTimeData = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Handle incoming floor data
   const handleFloorData = useCallback((data) => {
-    console.log('📊 Processing floor data:', data);
-
-    // Handle array of floors from backend
     if (data.floors && Array.isArray(data.floors)) {
       const updatedFloors = {};
 
@@ -56,9 +50,7 @@ export const useRealTimeData = () => {
       });
 
       setFloorData(updatedFloors);
-    }
-    // Handle single floor update (if backend sends individual updates)
-    else if (data.floorId) {
+    } else if (data.floorId) {
       const status = getFloorStatus(data);
       setFloorData((prev) => ({
         ...prev,
@@ -70,34 +62,35 @@ export const useRealTimeData = () => {
     }
   }, []);
 
-  // Handle incoming alerts
   const handleAlert = useCallback((alertData) => {
-    console.log('🚨 Processing alert:', alertData);
+    if (alertData.alerts && Array.isArray(alertData.alerts)) {
+      const allNewAlerts = [];
 
-    // Backend sends alerts with anomalies array inside
-    // Format: { floorId, floorName, anomalies: [...], timestamp, severity }
-    if (alertData.anomalies && Array.isArray(alertData.anomalies)) {
-      const newAlerts = alertData.anomalies.map((anomaly, index) => ({
-        id: `${alertData.floorId}_${alertData.timestamp}_${index}`,
-        floorId: alertData.floorId,
-        floorName: alertData.floorName,
-        type: anomaly.type,
-        severity: anomaly.severity,
-        message: anomaly.message,
-        value: anomaly.value,
-        recommendation: anomaly.recommendation,
-        timestamp: anomaly.timestamp || alertData.timestamp
-      }));
+      alertData.alerts.forEach((alertGroup) => {
+        if (alertGroup.anomalies && Array.isArray(alertGroup.anomalies)) {
+          alertGroup.anomalies.forEach((anomaly, index) => {
+            allNewAlerts.push({
+              id: `${alertGroup.floorId}_${alertGroup.timestamp}_${index}`,
+              floorId: alertGroup.floorId,
+              floorName: alertGroup.floorName,
+              type: anomaly.type,
+              severity: anomaly.severity,
+              message: anomaly.message,
+              value: anomaly.value,
+              recommendation: anomaly.recommendation,
+              timestamp: anomaly.timestamp || alertGroup.timestamp
+            });
+          });
+        }
+      });
 
-      // Add new alerts to the beginning, keep last 10
-      setAlerts((prev) => [...newAlerts, ...prev].slice(0, 10));
+      setAlerts((prev) => [...allNewAlerts, ...prev].slice(0, 10));
+    } else {
+      console.warn('⚠️ [handleAlert] Invalid alert data - missing alerts array');
     }
   }, []);
 
-  // Handle incoming predictions
   const handlePredictions = useCallback((data) => {
-    console.log('🔮 Processing predictions:', data);
-
     if (data.predictions && Array.isArray(data.predictions)) {
       const updatedPredictions = {};
 
@@ -109,17 +102,13 @@ export const useRealTimeData = () => {
     }
   }, []);
 
-  // Load initial data from REST API
   useEffect(() => {
     const loadInitialData = async () => {
-      console.log('🔄 [useRealTimeData] Loading initial data from REST API...');
       setIsLoading(true);
 
       try {
-        // Fetch initial floor data
         const floors = await fetchAllFloors();
 
-        // Process floors with status calculation
         const processedFloors = {};
         floors.forEach((floor) => {
           const status = getFloorStatus(floor);
@@ -130,14 +119,10 @@ export const useRealTimeData = () => {
         });
 
         setFloorData(processedFloors);
-        console.log('✅ [useRealTimeData] Initial floor data loaded:', floors.length, 'floors');
 
-        // Fetch initial alerts
         try {
           const alertsData = await fetchAlerts();
 
-          // Backend returns alerts with anomalies array
-          // Format each alert's anomaly as a separate alert for display
           const formattedAlerts = [];
 
           alertsData.forEach((alertGroup) => {
@@ -158,45 +143,30 @@ export const useRealTimeData = () => {
             }
           });
 
-          // Sort by timestamp (newest first) and take last 10
           formattedAlerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
           setAlerts(formattedAlerts.slice(0, 10));
-
-          console.log(
-            '✅ [useRealTimeData] Initial alerts loaded:',
-            formattedAlerts.length,
-            'alerts'
-          );
         } catch (alertError) {
           console.warn('⚠️ [useRealTimeData] Could not load alerts:', alertError.message);
-          // Continue without alerts - not critical
         }
 
         setIsLoading(false);
       } catch (error) {
         console.error('❌ [useRealTimeData] Error loading initial data:', error.message);
         setIsLoading(false);
-        // Keep using INITIAL_FLOOR_DATA as fallback
       }
     };
 
     loadInitialData();
   }, []);
 
-  // Subscribe to WebSocket updates
   useEffect(() => {
-    console.log('🔌 [useRealTimeData] Subscribing to WebSocket events...');
-
-    // Subscribe to real-time data
     subscribeToFloorData(handleFloorData);
     subscribeToAlerts(handleAlert);
     subscribeToPredictions(handlePredictions);
 
     setIsConnected(true);
 
-    // Cleanup on unmount
     return () => {
-      console.log('🔌 [useRealTimeData] Disconnecting from WebSocket...');
       disconnectSocket();
       setIsConnected(false);
     };

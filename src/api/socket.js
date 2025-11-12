@@ -4,6 +4,9 @@ import { io } from 'socket.io-client';
 const SOCKET_URL = 'http://localhost:3000';
 
 let socket = null;
+const ALERTS = 'new-alerts';
+const FLOOR_DATA = 'floor-data';
+const PREDICTIONS = 'predictions';
 
 /**
  * Initialize and return socket connection
@@ -66,12 +69,11 @@ export const getSocket = () => {
 export const subscribeToFloorData = (callback) => {
   const socketInstance = getSocket();
 
-  socketInstance.on('floorData', (data) => {
-    console.log('📊 [Floor Data Received]', data);
+  socketInstance.on(FLOOR_DATA, (data) => {
     callback(data);
   });
 
-  console.log('👂 Subscribed to floorData events');
+  console.log(`👂 Subscribed to ${FLOOR_DATA} events`);
 };
 
 /**
@@ -81,12 +83,11 @@ export const subscribeToFloorData = (callback) => {
 export const subscribeToAlerts = (callback) => {
   const socketInstance = getSocket();
 
-  socketInstance.on('alert', (alert) => {
-    console.log('🚨 [Alert Received]', alert);
+  socketInstance.on(ALERTS, (alert) => {
     callback(alert);
   });
 
-  console.log('👂 Subscribed to alert events');
+  console.log(`👂 Subscribed to ${ALERTS} events`);
 };
 
 /**
@@ -96,12 +97,12 @@ export const subscribeToAlerts = (callback) => {
 export const subscribeToPredictions = (callback) => {
   const socketInstance = getSocket();
 
-  socketInstance.on('predictions', (predictions) => {
+  socketInstance.on(PREDICTIONS, (predictions) => {
     console.log('🔮 [Predictions Received]', predictions);
     callback(predictions);
   });
 
-  console.log('👂 Subscribed to predictions events');
+  console.log(`👂 Subscribed to ${PREDICTIONS} events`);
 };
 
 /**
