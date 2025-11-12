@@ -1,104 +1,16 @@
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { getSocket } from '../api/socket';
-
-const DebugPanel = styled.div`
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: rgba(0, 0, 0, 0.95);
-  border: 1px solid #646cff;
-  border-radius: 8px;
-  padding: 16px;
-  max-width: 400px;
-  max-height: 400px;
-  overflow-y: auto;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  z-index: 9999;
-  box-shadow: 0 4px 16px rgba(100, 108, 255, 0.3);
-`;
-
-const Title = styled.h3`
-  color: #646cff;
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Status = styled.div`
-  color: ${(props) => (props.$connected ? '#00ff88' : '#ff4d4f')};
-  font-weight: bold;
-  margin-bottom: 12px;
-
-  &::before {
-    content: '●';
-    margin-right: 6px;
-  }
-`;
-
-const Info = styled.div`
-  color: #ffffff;
-  margin-bottom: 8px;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-`;
-
-const Label = styled.span`
-  color: #646cff;
-  font-weight: bold;
-`;
-
-const EventLog = styled.div`
-  margin-top: 12px;
-  max-height: 200px;
-  overflow-y: auto;
-  border-top: 1px solid rgba(100, 108, 255, 0.3);
-  padding-top: 8px;
-`;
-
-const Event = styled.div`
-  color: #00ff88;
-  margin-bottom: 4px;
-  font-size: 11px;
-  padding: 4px;
-  background: rgba(0, 255, 136, 0.05);
-  border-radius: 3px;
-  word-wrap: break-word;
-`;
-
-const CloseButton = styled.button`
-  background: transparent;
-  border: 1px solid #ff4d4f;
-  color: #ff4d4f;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-
-  &:hover {
-    background: rgba(255, 77, 79, 0.1);
-  }
-`;
-
-const ClearButton = styled.button`
-  background: transparent;
-  border: 1px solid #646cff;
-  color: #646cff;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  margin-top: 8px;
-  width: 100%;
-
-  &:hover {
-    background: rgba(100, 108, 255, 0.1);
-  }
-`;
+import {
+  DebugPanel,
+  Title,
+  Status,
+  Info,
+  Label,
+  EventLog,
+  Event,
+  CloseButton,
+  ClearButton
+} from '../styles/SocketDebugger.styled';
 
 /**
  * SocketDebugger - Visual debugging component for WebSocket

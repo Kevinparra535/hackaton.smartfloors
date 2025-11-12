@@ -1,101 +1,14 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import styled from 'styled-components';
-
-const Panel = styled.div`
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  background: rgba(26, 26, 26, 0.95);
-  border-radius: 12px;
-  padding: 20px;
-  width: 320px;
-  max-height: 50dvh;
-  overflow-y: auto;
-  border: 1px solid rgba(100, 108, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(100, 108, 255, 0.5);
-    border-radius: 3px;
-  }
-`;
-
-const Title = styled.h2`
-  color: #ffffff;
-  font-size: 1.4rem;
-  margin: 0 0 16px 0;
-  font-weight: 600;
-`;
-
-const AlertItem = styled(motion.div)`
-  background: ${(props) => {
-    const severity = props.$severity;
-    // Map 'critical' from backend to 'danger' color
-    if (severity === 'danger' || severity === 'critical') {
-      return 'rgba(255, 77, 79, 0.15)';
-    }
-    if (severity === 'warning') {
-      return 'rgba(255, 217, 102, 0.15)';
-    }
-    return 'rgba(0, 255, 136, 0.15)';
-  }};
-  border-left: 3px solid
-    ${(props) => {
-      const severity = props.$severity;
-      // Map 'critical' from backend to 'danger' color
-      if (severity === 'danger' || severity === 'critical') {
-        return '#ff4d4f';
-      }
-      if (severity === 'warning') {
-        return '#ffd966';
-      }
-      return '#00ff88';
-    }};
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-`;
-
-const AlertHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-`;
-
-const AlertFloor = styled.span`
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 0.9rem;
-`;
-
-const AlertTime = styled.span`
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.75rem;
-`;
-
-const AlertMessage = styled.p`
-  color: rgba(255, 255, 255, 0.85);
-  margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.4;
-`;
-
-const EmptyState = styled.div`
-  color: rgba(255, 255, 255, 0.4);
-  text-align: center;
-  padding: 40px 20px;
-  font-size: 0.9rem;
-`;
+import { AnimatePresence } from 'framer-motion';
+import {
+  Panel,
+  Title,
+  AlertItem,
+  AlertHeader,
+  AlertFloor,
+  AlertTime,
+  AlertMessage,
+  EmptyState
+} from '../styles/AlertsPanel.styled';
 
 const formatTime = (timestamp) => {
   const date = new Date(timestamp);

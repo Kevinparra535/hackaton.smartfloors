@@ -63,8 +63,8 @@ export const Select = styled.select`
  */
 export const LegendContainer = styled.div`
   position: fixed;
-  top: 80px;
-  right: 24px;
+  bottom: 10px;
+  left: 10px;
   background: rgba(26, 26, 26, 0.95);
   border: 1px solid rgba(100, 108, 255, 0.2);
   border-radius: 12px;
@@ -83,16 +83,11 @@ export const LegendTitle = styled.h3`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
-  &::before {
-    content: '📊';
-    font-size: 1.1rem;
-  }
 `;
 
 export const LegendItems = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.6rem;
 `;
 
@@ -111,12 +106,12 @@ export const LegendItem = styled.div`
 `;
 
 export const ColorIndicator = styled.div`
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 6px;
   background: ${(props) => props.$color || '#646cff'};
   border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 
+  box-shadow:
     0 0 8px ${(props) => props.$color || '#646cff'},
     inset 0 0 8px rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
@@ -124,7 +119,7 @@ export const ColorIndicator = styled.div`
 
   ${LegendItem}:hover & {
     transform: scale(1.15);
-    box-shadow: 
+    box-shadow:
       0 0 16px ${(props) => props.$color || '#646cff'},
       inset 0 0 8px rgba(255, 255, 255, 0.2);
   }
@@ -137,6 +132,7 @@ export const LegendText = styled.div`
 `;
 
 export const LegendLabel = styled.span`
+  font-size: 0.75rem;
   font-weight: 600;
   color: ${(props) => props.$color || '#ffffff'};
 `;
