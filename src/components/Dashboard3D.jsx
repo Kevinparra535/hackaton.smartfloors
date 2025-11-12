@@ -6,15 +6,13 @@ import { Environment } from '@react-three/drei';
  * Dashboard3D component - Canvas wrapper for 3D visualization
  * @param {Object} props
  * @param {Object} props.floorData - Floor data for visualization
- * @param {Function} props.onFloorHover - Callback for floor hover events
  * @param {Function} props.onFloorClick - Callback for floor click events
  */
-const Dashboard3D = ({ floorData, onFloorHover, onFloorClick }) => {
+const Dashboard3D = ({ floorData, onFloorClick }) => {
   return (
     <Canvas shadows gl={{ antialias: true, alpha: false }} style={{}}>
       <BuildingScene
         floorData={floorData}
-        onFloorHover={onFloorHover}
         onFloorClick={onFloorClick}
       />
     </Canvas>

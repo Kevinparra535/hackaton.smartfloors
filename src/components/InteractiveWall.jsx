@@ -42,6 +42,36 @@ const ChartsWrapper = styled.div`
   overflow-x: hidden;
 `;
 
+const CloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: rgba(255, 77, 79, 0.2);
+  border: 2px solid #ff4d4f;
+  border-radius: 8px;
+  color: #ff4d4f;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    background: rgba(255, 77, 79, 0.4);
+    border-color: #ff7875;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
 /**
  * InteractiveWall - Simple vertical wall plane with HTML overlay
  */
@@ -71,6 +101,30 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
     updateDimensions();
   }, [size.width, size.height]); // Update when canvas size changes
 
+  // Disable camera controls when charts are focused
+  useEffect(() => {
+    if (!cameraControlsRef?.current) return;
+
+    const controls = cameraControlsRef.current;
+
+    if (isFocused) {
+      // Disable camera controls to allow HTML scroll
+      controls.enabled = false;
+      console.log('🔒 Camera controls disabled - HTML scroll enabled');
+    } else {
+      // Re-enable camera controls when not focused
+      controls.enabled = true;
+      console.log('🔓 Camera controls enabled - HTML scroll disabled');
+    }
+
+    // Cleanup function
+    return () => {
+      if (controls) {
+        controls.enabled = true;
+      }
+    };
+  }, [isFocused, cameraControlsRef]);
+
   const handleClick = () => {
     if (!cameraControlsRef?.current) {
       console.error('❌ CameraControls not available');
@@ -80,34 +134,42 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
     const controls = cameraControlsRef.current;
     const wallPosition = { x: 15, y: 0, z: 0 };
 
-    if (isFocused) {
-      // Reset camera to default view
-      console.log('🔄 Resetting camera from HTML');
-      controls.setLookAt(
-        10,
-        6,
-        5, // Default camera position
-        0,
-        0,
-        0, // Look at center
-        true // Smooth transition
-      );
-      setIsFocused(false);
-    } else {
-      // Dolly to HTML wall - close enough to fill the screen
-      // Center camera at same Y position as HTML for better framing
-      console.log('🎬 Dolly to HTML wall');
-      controls.setLookAt(
-        wallPosition.x - 4,
-        0,
-        0, // Camera at same Y height as HTML center
-        wallPosition.x,
-        0,
-        0, // Look directly at HTML center
-        true // Smooth transition
-      );
-      setIsFocused(true);
+    // Dolly to HTML wall - close enough to fill the screen
+    console.log('🎬 Dolly to HTML wall');
+    controls.setLookAt(
+      wallPosition.x - 4,
+      0,
+      0, // Camera at same Y height as HTML center
+      wallPosition.x,
+      0,
+      0, // Look directly at HTML center
+      true // Smooth transition
+    );
+    setIsFocused(true);
+  };
+
+  const handleClose = (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    
+    if (!cameraControlsRef?.current) {
+      console.error('❌ CameraControls not available');
+      return;
     }
+
+    const controls = cameraControlsRef.current;
+    
+    // Reset camera to default view
+    console.log('🔄 Resetting camera from charts');
+    controls.setLookAt(
+      10,
+      6,
+      5, // Default camera position
+      0,
+      0,
+      0, // Look at center
+      true // Smooth transition
+    );
+    setIsFocused(false);
   };
 
   return (
@@ -146,12 +208,34 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
         <HtmlContainer
           $width={dimensions.width}
           $height={dimensions.height}
-          onClick={handleClick}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: isFocused ? 'default' : 'pointer', position: 'relative' }}
+          onClick={!isFocused ? handleClick : undefined}
         >
           <Title>SmartFloors Analytics - Piso {selectedFloorId}</Title>
+          
+          {isFocused && (
+            <CloseButton onClick={handleClose}>
+              ✕ Cerrar Gráficas
+            </CloseButton>
+          )}
+
           <ChartsWrapper>
-            <TrendCharts floorId={selectedFloorId} />
+            {isFocused ? (
+              <TrendCharts floorId={selectedFloorId} />
+            ) : (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+                color: 'rgba(255, 255, 255, 0.6)',
+                fontSize: '18px',
+                textAlign: 'center',
+                padding: '40px'
+              }}>
+                Haz click para ver los gráficos de tendencia
+              </div>
+            )}
           </ChartsWrapper>
         </HtmlContainer>
       </Html>

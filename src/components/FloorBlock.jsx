@@ -14,13 +14,11 @@ import VolumetricFog from './VolumetricFog';
  * @param {Object} props
  * @param {Object} props.data - Floor data (floorId, name, temperature, humidity, powerConsumption, occupancy, status)
  * @param {number} props.position - Y position of the floor
- * @param {Function} props.onHover - Callback when floor is hovered
  * @param {Function} props.onClick - Callback when floor is clicked for zoom
  */
-export default function FloorBlock({ data, position, onHover, onClick }) {
+export default function FloorBlock({ data, position, onClick }) {
   const meshRef = useRef();
   const materialRef = useRef();
-  const isHoveredRef = useRef(false);
 
   // Estado reactivo para el modo de visualización
   const [visualizationMode, setVisualizationMode] = useState(() => {
@@ -54,27 +52,6 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
       window.removeEventListener('visualizationModeChange', handleModeChange);
     };
   }, [data.floorId]);
-
-  // Handle hover state
-  const handlePointerOver = () => {
-    if (!isHoveredRef.current) {
-      isHoveredRef.current = true;
-      document.body.style.cursor = 'pointer';
-      if (onHover) {
-        onHover(data);
-      }
-    }
-  };
-
-  const handlePointerOut = () => {
-    if (isHoveredRef.current) {
-      isHoveredRef.current = false;
-      document.body.style.cursor = 'default';
-      if (onHover) {
-        onHover(null);
-      }
-    }
-  };
 
   // Handle click for zoom functionality
   const handleClick = (event) => {
@@ -122,9 +99,6 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
       {/* Main floor block with heat layer material */}
       <mesh
         ref={meshRef}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}
-        onPointerMove={handlePointerOver}
         onPointerDown={handleClick}
         castShadow
         receiveShadow

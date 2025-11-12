@@ -29,7 +29,6 @@ const EmptyInfo = styled.div`
 const Home = () => {
   const { floorData, predictions, isLoading, currentMode } = useOutletContext();
 
-  const [hoveredFloor, setHoveredFloor] = useState(null);
   const [focusedFloor, setFocusedFloor] = useState(null);
 
   const handleFloorClick = (clickData) => {
@@ -37,32 +36,27 @@ const Home = () => {
     setFocusedFloor(clickData?.floorData || null);
   };
 
-  const displayedFloor = !isLoading && (hoveredFloor || focusedFloor || floorData[1]);
-  const displayedPredictions = hoveredFloor
-    ? predictions[hoveredFloor.floorId]
-    : focusedFloor
-      ? predictions[focusedFloor.floorId]
-      : predictions[1];
-  const displayedFloorName = hoveredFloor
-    ? hoveredFloor.name || `Piso ${hoveredFloor.floorId}`
-    : focusedFloor
-      ? focusedFloor.name || `Piso ${focusedFloor.floorId}`
-      : null;
+  const displayedFloor = !isLoading && (focusedFloor || floorData[1]);
+  const displayedPredictions = focusedFloor
+    ? predictions[focusedFloor.floorId]
+    : predictions[1];
+  const displayedFloorName = focusedFloor
+    ? focusedFloor.name || `Piso ${focusedFloor.floorId}`
+    : null;
 
   return (
     <MainContent>
       <CanvasWrapper>
         <Dashboard3D
           floorData={floorData}
-          onFloorHover={setHoveredFloor}
           onFloorClick={handleFloorClick}
         />
       </CanvasWrapper>
 
       {/* Color Legend - Leyenda de estados */}
-      {/* <ColorLegend currentMode={currentMode} /> */}
+      {/* <ColorLegend currentMode={currentMode} />
 
-      {/* <InfoPanel>
+      <InfoPanel>
         <InfoTitle>
           {hoveredFloor
             ? `${hoveredFloor.name || `Piso ${hoveredFloor.floorId}`} - Métricas`

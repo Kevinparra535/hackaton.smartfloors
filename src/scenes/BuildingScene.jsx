@@ -3,13 +3,15 @@ import {
   PerspectiveCamera,
   Stars,
   SpotLight,
-  CameraControls
+  CameraControls,
+  Html
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import FloorBlock from '../components/FloorBlock';
 import FloatingParticles from '../components/FloatingParticles';
 import GradientBackground from '../components/GradientBackground';
 import InteractiveWall from '../components/InteractiveWall';
+import FloorInfoPanel from '../components/FloorInfoPanel';
 import { useCameraZoom } from '../hooks/useCameraZoom';
 import { useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -18,81 +20,83 @@ import * as THREE from 'three';
  * BuildingScene - 3D scene containing all floor blocks with immersive effects
  * @param {Object} props
  * @param {Object} props.floorData - Data for all floors
- * @param {Function} props.onFloorHover - Callback when a floor is hovered
  * @param {Function} props.onFloorClick - Callback when a floor is clicked for zoom
  */
-const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
+const BuildingScene = ({ floorData, onFloorClick }) => {
   const cameraControlsRef = useRef();
   const { resetCamera } = useCameraZoom();
   const lastClickedFloor = useRef(null);
   const [selectedFloorId, setSelectedFloorId] = useState(1);
+  const [selectedFloorData, setSelectedFloorData] = useState(null);
+  const [infoPanelPosition, setInfoPanelPosition] = useState([0, 0, 0]);
 
-  const handleHover = (data) => {
-    onFloorHover(data);
-  };
+  const DEFAULT_CAMERA_POSITION = [0, 0, 10];
+  const DEFAULT_CAMERA_TARGET = [0, 0, 0];
+
   const handleClick = (clickData) => {
     if (onFloorClick) {
       onFloorClick(clickData);
     }
 
-    // Update selected floor for charts
     setSelectedFloorId(clickData.floorId);
+    setSelectedFloorData(clickData.floorData);
 
-    // Dolly camera to the clicked floor using CameraControls
+    setInfoPanelPosition([-3.5, clickData.floorY, 0]);
+
     if (clickData?.floorY !== undefined && cameraControlsRef.current) {
       const controls = cameraControlsRef.current;
 
-      // Check if clicking the same floor - reset camera
       if (lastClickedFloor.current === clickData.floorId) {
-        console.log('🔄 Resetting camera to default view');
-        controls.setLookAt(
-          10,
-          6,
-          5, // Default camera position
-          0,
-          0,
-          0, // Look at center
-          true // Smooth transition
-        );
+        controls.setLookAt(...DEFAULT_CAMERA_POSITION, ...DEFAULT_CAMERA_TARGET, true);
         lastClickedFloor.current = null;
+        setSelectedFloorData(null);
+        controls.enabled = true;
         return;
       }
 
-      // Get current camera position to calculate dolly direction
       const targetPosition = {
-        x: 0, // Center X (floors are centered)
-        y: clickData.floorY, // Floor Y position
-        z: 0 // Center Z
+        x: 0,
+        y: clickData.floorY,
+        z: 0
       };
 
-      // Use setLookAt to dolly the camera closer to the floor
-      // This physically moves the camera (dolly) instead of just changing target
       controls.setLookAt(
-        3,
-        clickData.floorY,
-        5, // Move camera closer to the floor
+        0,
+        clickData.floorY + 0.5,
+        8,
         targetPosition.x,
         targetPosition.y,
-        targetPosition.z, // Look at floor
-        true // Enable smooth transition
+        targetPosition.z,
+        true
       );
 
+      setTimeout(() => {
+        if (controls) {
+          controls.enabled = false;
+          console.log('🔒 Camera controls locked');
+        }
+      }, 300);
+
       lastClickedFloor.current = clickData.floorId;
-      console.log('🎬 Dolly to floor:', clickData.floorId, 'at Y:', clickData.floorY);
     }
   };
 
-  // Calculate Y positions for floors (stacked vertically)
+  const handleViewCharts = () => {
+    if (cameraControlsRef.current) {
+      const controls = cameraControlsRef.current;
+
+      controls.setLookAt(0, 0, 0, 10, 0, 0, true);
+    }
+  };
+
   const getFloorPosition = (floorNumber) => {
-    // Center the building vertically (5 floors)
-    // Space floors 2 units apart for better visibility
     return (floorNumber - 3) * 1.5;
   };
 
   return (
     <>
       {/* Camera setup with better positioning */}
-      <PerspectiveCamera makeDefault position={[-5, 1, 10]} fov={55} />
+      <PerspectiveCamera makeDefault position={DEFAULT_CAMERA_POSITION} fov={55} />
 
       {/* Fog for depth and atmosphere */}
       <fog attach='fog' args={['#0a0a0a', 5, 30]} />
@@ -125,6 +129,38 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
       {/* Interactive wall - Right side with integrated 3D HTML */}
       <InteractiveWall cameraControlsRef={cameraControlsRef} selectedFloorId={selectedFloorId} />
 
+      {/* Floor Info Panel - Shows when a floor is clicked */}
+      {selectedFloorData && (
+        <Html
+          center
+          sprite
+          occlude={false}
+          transform={false}
+          distanceFactor={6}
+          zIndexRange={[9999, 0]}
+          position={infoPanelPosition}
+          style={{ pointerEvents: 'none' }}
+        >
+          <FloorInfoPanel
+            floorData={selectedFloorData}
+            onViewCharts={handleViewCharts}
+            onClose={() => {
+              if (cameraControlsRef.current) {
+                cameraControlsRef.current.enabled = true;
+                console.log('🔓 Camera controls unlocked');
+              }
+
+              if (cameraControlsRef.current) {
+                cameraControlsRef.current.setLookAt(0, 0, 10, 0, 0, 0, true);
+              }
+
+              setSelectedFloorData(null);
+              lastClickedFloor.current = null;
+            }}
+          />
+        </Html>
+      )}
+
       {/* Environment for reflections */}
       <Environment preset='city' background={false} />
 
@@ -135,12 +171,10 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
               key={floor.floorId}
               data={floor}
               position={getFloorPosition(floor.floorId)}
-              onHover={handleHover}
               onClick={handleClick}
             />
           ))
-        : // Show placeholder blocks while data is loading
-          [1, 2, 3].map((floorId) => (
+        : [1, 2, 3].map((floorId) => (
             <FloorBlock
               key={`placeholder-${floorId}`}
               data={{
@@ -153,7 +187,6 @@ const BuildingScene = ({ floorData, onFloorHover, onFloorClick }) => {
                 status: 'normal'
               }}
               position={getFloorPosition(floorId)}
-              onHover={handleHover}
               onClick={handleClick}
             />
           ))}
