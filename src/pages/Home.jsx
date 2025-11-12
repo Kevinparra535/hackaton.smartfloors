@@ -27,7 +27,7 @@ const EmptyInfo = styled.div`
 `;
 
 const Home = () => {
-  const { floorData, predictions, alerts, isLoading, currentMode } = useOutletContext();
+  const { floorData, predictions, isLoading, currentMode } = useOutletContext();
 
   const [hoveredFloor, setHoveredFloor] = useState(null);
   const [focusedFloor, setFocusedFloor] = useState(null);
@@ -38,9 +38,9 @@ const Home = () => {
   };
 
   const displayedFloor = !isLoading && (hoveredFloor || focusedFloor || floorData[1]);
-  const displayedPredictions = hoveredFloor 
-    ? predictions[hoveredFloor.floorId] 
-    : focusedFloor 
+  const displayedPredictions = hoveredFloor
+    ? predictions[hoveredFloor.floorId]
+    : focusedFloor
       ? predictions[focusedFloor.floorId]
       : predictions[1];
   const displayedFloorName = hoveredFloor
@@ -52,8 +52,8 @@ const Home = () => {
   return (
     <MainContent>
       <CanvasWrapper>
-        <Dashboard3D 
-          floorData={floorData} 
+        <Dashboard3D
+          floorData={floorData}
           onFloorHover={setHoveredFloor}
           onFloorClick={handleFloorClick}
         />
@@ -102,7 +102,7 @@ const Home = () => {
 
       <PredictionsPanel predictions={displayedPredictions} floorName={displayedFloorName} />
 
-      <AlertsPanel alerts={alerts} />
+      {/* <AlertsPanel alerts={alerts} /> */}
     </MainContent>
   );
 };

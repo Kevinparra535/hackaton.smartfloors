@@ -2,9 +2,7 @@ import { SelectorContainer, SelectorLabel, Select } from '../styles/Visualizatio
 
 const MODES = [
   { value: 'heat_layer', label: 'Capas de Color' },
-  { value: 'volumetric', label: 'Niebla Térmica' },
-  { value: 'energy_bars', label: 'Barras de Energía' },
-  { value: 'hybrid', label: 'Híbrido' }
+  { value: 'volumetric', label: 'Niebla Térmica' }
 ];
 
 /**

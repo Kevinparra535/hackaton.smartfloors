@@ -23,7 +23,7 @@ export default function VolumetricFog({ config, settings }) {
       const x = (Math.random() - 0.5) * settings.particleSpread;
       const y = (Math.random() - 0.5) * settings.volumeSize[1];
       const z = (Math.random() - 0.5) * settings.particleSpread;
-      
+
       positions.push(x, y, z);
     }
 
@@ -64,7 +64,7 @@ export default function VolumetricFog({ config, settings }) {
     if (config.pulsate && fogRef.current) {
       const pulse = Math.sin(time * 1.5) * 0.2 + 0.8;
       fogRef.current.material.opacity = config.opacity * pulse;
-      
+
       if (glowRef.current) {
         glowRef.current.material.opacity = config.glow * pulse;
       }

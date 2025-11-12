@@ -3,9 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { getFloorHeatConfig } from '../config/heatLayerConfig';
 import { getVolumetricConfig, VISUALIZATION_MODES } from '../config/visualizationModes';
-import { getEnergyConfig } from '../config/energyBarsConfig';
 import VolumetricFog from './VolumetricFog';
-import EnergyBars from './EnergyBars';
 
 /**
  * FloorBlock component - 3D representation of a building floor with Heat Layer visualization
@@ -32,14 +30,9 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
   // Get volumetric configuration
   const volumetricData = getVolumetricConfig(state);
   
-  // Get energy bars configuration
-  const energyData = getEnergyConfig(data);
-  
   // Determinar qué mostrar basado en el modo actual
   const showVolumetric = visualizationMode === VISUALIZATION_MODES.VOLUMETRIC;
   const showHeatLayer = visualizationMode === VISUALIZATION_MODES.HEAT_LAYER;
-  const showEnergyBars = visualizationMode === VISUALIZATION_MODES.ENERGY_BARS ||
-                        visualizationMode === VISUALIZATION_MODES.HYBRID;
 
   // Escuchar cambios de modo de visualización
   useEffect(() => {
@@ -151,7 +144,7 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
           roughness={0.3}
           envMapIntensity={1}
           transparent
-          opacity={showHeatLayer ? settings.mainOpacity : (showEnergyBars ? 0.3 : 0.4)}
+          opacity={showHeatLayer ? settings.mainOpacity : 0.4}
         />
       </mesh>
 
@@ -173,14 +166,6 @@ export default function FloorBlock({ data, position, onHover, onClick }) {
         <VolumetricFog 
           config={volumetricData.config} 
           settings={volumetricData.settings}
-        />
-      )}
-
-      {/* Energy Bars - Temperature + Power Consumption visualization */}
-      {showEnergyBars && (
-        <EnergyBars
-          config={energyData.config}
-          settings={energyData.settings}
         />
       )}
 

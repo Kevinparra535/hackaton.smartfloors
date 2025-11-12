@@ -59,7 +59,7 @@ const LoadingText = styled.div`
 
 const Layout = () => {
   const { floorData, predictions, alerts, isConnected, isLoading } = useRealTimeData();
-  const { currentMode, setVisualizationMode } = useVisualizationMode();
+  const { currentMode } = useVisualizationMode();
 
   // Show loading screen while fetching initial data
   if (isLoading) {
@@ -75,8 +75,7 @@ const Layout = () => {
     <LayoutContainer>
       <Header
         isConnected={isConnected}
-        currentMode={currentMode}
-        onModeChange={setVisualizationMode}
+        alerts={alerts}
       />
       <Main>
         <Outlet context={{ floorData, predictions, alerts, isLoading, currentMode }} />
