@@ -110,12 +110,23 @@ const CustomTooltipContent = ({ active, payload, label }) => {
 /**
  * TrendCharts - Display historical trends for temperature, humidity, and power consumption
  * @param {Object} props
- * @param {number} props.floorId - Initial floor ID to display charts for (1-5)
+ * @param {number} props.floorId - Initial floor ID to display charts for (optional)
+ * @param {Object} props.floorData - Real-time data for all floors from backend (keyed by floorId)
  */
-export default function TrendCharts({ floorId: initialFloorId = 1 }) {
-  const [selectedFloor, setSelectedFloor] = useState(initialFloorId);
+export default function TrendCharts({ floorId: initialFloorId, floorData = {} }) {
+  // Default to 'all' to show all floors if no specific floor is selected
+  const [selectedFloor, setSelectedFloor] = useState(initialFloorId || 'all');
   const [chartData, setChartData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Get available floors from backend data
+  const availableFloors = Object.keys(floorData)
+    .map((id) => parseInt(id))
+    .filter((id) => !isNaN(id))
+    .sort((a, b) => a - b);
+
+  // Use available floors or fallback to default range
+  const floors = availableFloors.length > 0 ? availableFloors : [1, 2, 3, 4, 5];
 
   // Floor colors for multi-floor view
   const FLOOR_COLORS = {
@@ -126,13 +137,11 @@ export default function TrendCharts({ floorId: initialFloorId = 1 }) {
     5: '#9d4edd'
   };
 
-  const FLOOR_NAMES = {
-    1: 'Piso 1',
-    2: 'Piso 2',
-    3: 'Piso 3',
-    4: 'Piso 4',
-    5: 'Piso 5'
-  };
+  // Generate floor names dynamically from backend data
+  const FLOOR_NAMES = floors.reduce((acc, floorId) => {
+    acc[floorId] = floorData[floorId]?.name || `Piso ${floorId}`;
+    return acc;
+  }, {});
 
   // Fetch historical data when selectedFloor changes
   useEffect(() => {
@@ -163,10 +172,10 @@ export default function TrendCharts({ floorId: initialFloorId = 1 }) {
       setIsLoading(true);
       try {
         if (selectedFloor === 'all') {
-          // Load data for all floors
+          // Load data for all floors (only available floors from backend)
           const allData = {};
 
-          for (let floor = 1; floor <= 5; floor++) {
+          for (const floor of floors) {
             try {
               const history = await fetchFloorHistory(floor, 48);
 
@@ -193,7 +202,7 @@ export default function TrendCharts({ floorId: initialFloorId = 1 }) {
           timePoints.forEach((time, index) => {
             const dataPoint = { time };
 
-            for (let floor = 1; floor <= 5; floor++) {
+            for (const floor of floors) {
               if (allData[floor] && allData[floor][index]) {
                 dataPoint[`temperature${floor}`] = allData[floor][index].temperature;
                 dataPoint[`humidity${floor}`] = allData[floor][index].humidity;
@@ -259,7 +268,7 @@ export default function TrendCharts({ floorId: initialFloorId = 1 }) {
         <FloorButton $active={selectedFloor === 'all'} onClick={() => setSelectedFloor('all')}>
           Todos los Pisos
         </FloorButton>
-        {[1, 2, 3, 4, 5].map((floor) => (
+        {floors.map((floor) => (
           <FloorButton
             key={floor}
             $active={selectedFloor === floor}
@@ -285,7 +294,7 @@ export default function TrendCharts({ floorId: initialFloorId = 1 }) {
             <Legend wrapperStyle={{ color: '#fff', fontSize: '12px' }} />
             {selectedFloor === 'all' ? (
               // Multiple lines for all floors
-              [1, 2, 3, 4, 5].map((floor) => (
+              floors.map((floor) => (
                 <Line
                   key={`temp-${floor}`}
                   type='monotone'
@@ -329,7 +338,7 @@ export default function TrendCharts({ floorId: initialFloorId = 1 }) {
             <Legend wrapperStyle={{ color: '#fff', fontSize: '12px' }} />
             {selectedFloor === 'all' ? (
               // Multiple lines for all floors
-              [1, 2, 3, 4, 5].map((floor) => (
+              floors.map((floor) => (
                 <Line
                   key={`humidity-${floor}`}
                   type='monotone'
@@ -373,7 +382,7 @@ export default function TrendCharts({ floorId: initialFloorId = 1 }) {
             <Legend wrapperStyle={{ color: '#fff', fontSize: '12px' }} />
             {selectedFloor === 'all' ? (
               // Multiple lines for all floors
-              [1, 2, 3, 4, 5].map((floor) => (
+              floors.map((floor) => (
                 <Line
                   key={`power-${floor}`}
                   type='monotone'

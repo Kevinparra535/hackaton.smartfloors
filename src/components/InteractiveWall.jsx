@@ -75,7 +75,11 @@ const CloseButton = styled.button`
 /**
  * InteractiveWall - Simple vertical wall plane with HTML overlay
  */
-export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1 }) {
+export default function InteractiveWall({
+  cameraControlsRef,
+  selectedFloorId = 1,
+  floorData = {}
+}) {
   const [isFocused, setIsFocused] = useState(false);
   const { size } = useThree(); // Get canvas size instead of window size
   const [dimensions, setDimensions] = useState({
@@ -217,7 +221,7 @@ export default function InteractiveWall({ cameraControlsRef, selectedFloorId = 1
 
           <ChartsWrapper>
             {isFocused ? (
-              <TrendCharts floorId={selectedFloorId} />
+              <TrendCharts floorId={selectedFloorId} floorData={floorData} />
             ) : (
               <div
                 style={{

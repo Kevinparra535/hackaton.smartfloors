@@ -279,6 +279,7 @@ const BuildingScene = ({ floorData, predictions, alerts = [], onFloorClick }) =>
       <InteractiveWall
         cameraControlsRef={cameraControlsRef}
         selectedFloorId={selectedFloorData?.floorId || null}
+        floorData={floorData}
       />
 
       <InteractiveWallLeft
