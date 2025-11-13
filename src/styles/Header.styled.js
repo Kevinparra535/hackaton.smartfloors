@@ -21,9 +21,9 @@ export const Title = styled.h1`
   align-items: center;
   gap: 12px;
 
-  &::before {
-    content: '🏢';
-    font-size: 2rem;
+  span {
+    font-weight: 900;
+    color: #00ff88;
   }
 `;
 

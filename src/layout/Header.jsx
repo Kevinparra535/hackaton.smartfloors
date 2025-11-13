@@ -88,14 +88,9 @@ const Header = ({ isConnected, alerts = [], onToggleSidebar, sidebarOpen }) => {
 
   return (
     <HeaderStyled>
-      <Title>SmartFloors AI</Title>
-
-      <Nav>
-        <TabLink to='/' end>
-          🏢 Dashboard 3D
-        </TabLink>
-        <TabLink to='/analytics'>📊 Análisis</TabLink>
-      </Nav>
+      <Title>
+        <span>SmartFloors</span> AI
+      </Title>
 
       <VisualizationSelector currentMode={currentMode} onModeChange={setVisualizationMode} />
 
