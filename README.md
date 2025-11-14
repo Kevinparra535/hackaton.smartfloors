@@ -13,7 +13,7 @@
 
 [🚀 Live Demo](https://hackathon-smarfloors.web.app) • [📚 Documentación](./docs) • [🎨 Visión Creativa](./docs/CREATIVE_VISION.md) • [🏗️ Arquitectura](./docs/ARCHITECTURE.md)
 
-![Hero](docs/HERO.png)
+![Hero](docs/HERO.gif)
 
 </div>
 
