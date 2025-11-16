@@ -2,7 +2,7 @@
 
 # 🏢 SmartFloors AI
 
-### *Transformando edificios en organismos vivos inteligentes*
+### _Transformando edificios en organismos vivos inteligentes_
 
 **Dashboard 3D de monitoreo en tiempo real con predicciones ML y detección de anomalías**
 
@@ -10,6 +10,7 @@
 [![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?logo=vite)](https://vitejs.dev/)
 [![Three.js](https://img.shields.io/badge/Three.js-R3F-black)](https://threejs.org/)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?logo=socket.io)](https://socket.io/)
+![Winner](https://img.shields.io/badge/🏆_Hackathon_Winner-1st_Place-blue?style=for-the-badge)
 
 [🚀 Live Demo](https://hackathon-smarfloors.web.app) • [📚 Documentación](./docs) • [🎨 Visión Creativa](./docs/CREATIVE_VISION.md) • [🏗️ Arquitectura](./docs/ARCHITECTURE.md)
 
@@ -37,13 +38,13 @@ SmartFloors no es solo un dashboard de monitoreo tradicional. Es una **experienc
 
 ### 🧬 El Edificio como Organismo Vivo
 
-| Concepto Visual | Significado Técnico |
-|----------------|-------------------|
-| 🫁 **Respiración (pulso)** | Actividad del sistema en tiempo real |
-| 🎨 **Color** | Estado de salud (normal, advertencia, peligro) |
-| 🌫️ **Niebla volumétrica** | Nivel de estrés térmico/energético |
-| ⚡ **Intensidad de brillo** | Consumo energético actual |
-| 🔮 **Alertas predictivas** | Anomalías futuras detectadas por ML |
+| Concepto Visual             | Significado Técnico                            |
+| --------------------------- | ---------------------------------------------- |
+| 🫁 **Respiración (pulso)**  | Actividad del sistema en tiempo real           |
+| 🎨 **Color**                | Estado de salud (normal, advertencia, peligro) |
+| 🌫️ **Niebla volumétrica**   | Nivel de estrés térmico/energético             |
+| ⚡ **Intensidad de brillo** | Consumo energético actual                      |
+| 🔮 **Alertas predictivas**  | Anomalías futuras detectadas por ML            |
 
 📖 **Lee más sobre la visión creativa:** [CREATIVE_VISION.md](./docs/CREATIVE_VISION.md)
 
@@ -92,14 +93,14 @@ Al abrir SmartFloors, verás:
 
 ### Interacción Intuitiva
 
-| Acción | Resultado |
-|--------|-----------|
-| **🖱️ Click en un piso** | Zoom + paneles flotantes (métricas + predicciones ML) |
-| **🔄 Doble click** | Resetea vista a perspectiva general |
-| **↔️ Arrastrar** | Rotación orbital 360° |
-| **🔍 Scroll** | Zoom dinámico |
-| **📊 Click pared derecha** | Abre gráficas de tendencias (4 horas) |
-| **📋 Click pared izquierda** | Abre tabla completa de alertas |
+| Acción                       | Resultado                                             |
+| ---------------------------- | ----------------------------------------------------- |
+| **🖱️ Click en un piso**      | Zoom + paneles flotantes (métricas + predicciones ML) |
+| **🔄 Doble click**           | Resetea vista a perspectiva general                   |
+| **↔️ Arrastrar**             | Rotación orbital 360°                                 |
+| **🔍 Scroll**                | Zoom dinámico                                         |
+| **📊 Click pared derecha**   | Abre gráficas de tendencias (4 horas)                 |
+| **📋 Click pared izquierda** | Abre tabla completa de alertas                        |
 
 > 🎮 **Guía interactiva completa:** Ver sección "Guía de Uso" más abajo
 
@@ -126,10 +127,10 @@ Al abrir SmartFloors, verás:
 
 ### 🚨 Sistema de Alertas Inteligente
 
-| Tipo de Alerta | Descripción |
-|---------------|-------------|
-| **🔴 Actuales** | Anomalías detectadas en tiempo real |
-| **🔮 Predictivas** | Anomalías futuras anticipadas por ML |
+| Tipo de Alerta         | Descripción                             |
+| ---------------------- | --------------------------------------- |
+| **🔴 Actuales**        | Anomalías detectadas en tiempo real     |
+| **🔮 Predictivas**     | Anomalías futuras anticipadas por ML    |
 | **⚠️ Recomendaciones** | Acciones específicas sugeridas por tipo |
 
 - **Clasificación automática:** Informativa, Media, Crítica
@@ -166,15 +167,15 @@ Al abrir SmartFloors, verás:
 
 <div align="center">
 
-| Categoría | Tecnologías |
-|-----------|-------------|
-| **⚛️ Core** | React 19.2 • Vite 7.2 • React Router 7 |
-| **🎨 3D** | React Three Fiber • @react-three/drei • @react-three/postprocessing |
-| **✨ Animaciones** | Framer Motion • GSAP concepts |
-| **🔌 Comunicación** | Socket.IO Client • REST API (fetch) |
-| **🎭 Estilos** | Styled-components 6.1 • Design Tokens • CSS-in-JS |
-| **📊 Data Viz** | Recharts • Custom 3D visualizations |
-| **🧪 Calidad** | ESLint 9.x (flat config) • Prettier • React StrictMode |
+| Categoría           | Tecnologías                                                         |
+| ------------------- | ------------------------------------------------------------------- |
+| **⚛️ Core**         | React 19.2 • Vite 7.2 • React Router 7                              |
+| **🎨 3D**           | React Three Fiber • @react-three/drei • @react-three/postprocessing |
+| **✨ Animaciones**  | Framer Motion • GSAP concepts                                       |
+| **🔌 Comunicación** | Socket.IO Client • REST API (fetch)                                 |
+| **🎭 Estilos**      | Styled-components 6.1 • Design Tokens • CSS-in-JS                   |
+| **📊 Data Viz**     | Recharts • Custom 3D visualizations                                 |
+| **🧪 Calidad**      | ESLint 9.x (flat config) • Prettier • React StrictMode              |
 
 </div>
 
@@ -310,23 +311,23 @@ SmartFloors usa un enfoque **REST para carga inicial + WebSocket para actualizac
 
 ### 🔗 Endpoints REST API
 
-| Método | Endpoint | Descripción | Uso |
-|--------|----------|-------------|-----|
-| `GET` | `/health` | Health check | Verificar backend activo |
-| `GET` | `/api/v1/floors` | Todos los pisos (5) | Carga inicial |
-| `GET` | `/api/v1/floors/:id` | Piso específico | Detalles individuales |
-| `GET` | `/api/v1/floors/:id/predictions?minutesAhead=60` | Predicciones ML | Panel de predicciones |
-| `GET` | `/api/v1/floors/:id/history?limit=60` | Historial 4h | Gráficas de tendencias |
-| `GET` | `/api/v1/alerts` | Alertas activas | Panel de alertas |
-| `GET` | `/api/v1/export/alerts/csv` | Exportar CSV | Descarga de alertas |
+| Método | Endpoint                                         | Descripción         | Uso                      |
+| ------ | ------------------------------------------------ | ------------------- | ------------------------ |
+| `GET`  | `/health`                                        | Health check        | Verificar backend activo |
+| `GET`  | `/api/v1/floors`                                 | Todos los pisos (5) | Carga inicial            |
+| `GET`  | `/api/v1/floors/:id`                             | Piso específico     | Detalles individuales    |
+| `GET`  | `/api/v1/floors/:id/predictions?minutesAhead=60` | Predicciones ML     | Panel de predicciones    |
+| `GET`  | `/api/v1/floors/:id/history?limit=60`            | Historial 4h        | Gráficas de tendencias   |
+| `GET`  | `/api/v1/alerts`                                 | Alertas activas     | Panel de alertas         |
+| `GET`  | `/api/v1/export/alerts/csv`                      | Exportar CSV        | Descarga de alertas      |
 
 ### 📨 Eventos WebSocket (Socket.IO)
 
-| Evento | Dirección | Frecuencia | Payload | Uso |
-|--------|-----------|------------|---------|-----|
-| `floor-data` | Server → Client | Cada 60s | `{floors: [...]}` | Actualizar métricas en vivo |
-| `new-alerts` | Server → Client | On anomaly | `{alerts: [...]}` | Notificación de nuevas alertas |
-| `predictions` | Server → Client | Cada 60s | `{floorId, predictions: [...]}` | Actualizar predicciones ML |
+| Evento        | Dirección       | Frecuencia | Payload                         | Uso                            |
+| ------------- | --------------- | ---------- | ------------------------------- | ------------------------------ |
+| `floor-data`  | Server → Client | Cada 60s   | `{floors: [...]}`               | Actualizar métricas en vivo    |
+| `new-alerts`  | Server → Client | On anomaly | `{alerts: [...]}`               | Notificación de nuevas alertas |
+| `predictions` | Server → Client | Cada 60s   | `{floorId, predictions: [...]}` | Actualizar predicciones ML     |
 
 ### 📦 Estructura de Datos
 
@@ -671,24 +672,28 @@ git push
 ### 🚀 Próximas Iteraciones
 
 **v2.1 — Expansión de Inteligencia**
+
 - [ ] Dashboard analytics avanzado con métricas agregadas
 - [ ] Reportes PDF automatizados (diarios/semanales)
 - [ ] Comparativas entre pisos
 - [ ] Detección de patrones de uso
 
 **v2.2 — Escalabilidad**
+
 - [ ] Soporte para múltiples edificios
 - [ ] Vista de campus completo
 - [ ] Filtros avanzados por edificio/piso
 - [ ] Modo offline con Service Workers
 
 **v2.3 — Experiencia de Usuario**
+
 - [ ] Notificaciones push (Web Push API)
 - [ ] i18n (Español, Inglés)
 - [ ] Modo oscuro/claro toggle
 - [ ] Tours guiados (onboarding)
 
 **v2.4 — Testing & Calidad**
+
 - [ ] Tests e2e con Playwright
 - [ ] Tests unitarios con Vitest
 - [ ] Storybook para componentes
@@ -716,6 +721,6 @@ Desarrollado con ❤️ usando **React 19 + Vite + React Three Fiber + Socket.IO
 
 ---
 
-*"Cada piso respira, reacciona y se comunica. SmartFloors no solo muestra lo que pasa — interpreta, predice y narra lo que el edificio necesita."*
+_"Cada piso respira, reacciona y se comunica. SmartFloors no solo muestra lo que pasa — interpreta, predice y narra lo que el edificio necesita."_
 
 </div>
